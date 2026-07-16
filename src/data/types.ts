@@ -20,6 +20,8 @@ export type TradeRoute = {
   category: string;
 };
 
+export type TerritoryRing = [number, number][];
+
 export type Empire = {
   id: string;
   name: string;
@@ -28,4 +30,5 @@ export type Empire = {
   cities: City[];
   categories: TradeCategory[];
   tradeRoutes: TradeRoute[];
+  territory?: TerritoryRing[];
 };

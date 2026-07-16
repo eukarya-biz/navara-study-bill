@@ -18,6 +18,12 @@ export type LegendOptions = {
    * checkbox toggles (a manual choice, not a trace).
    */
   onVisibilityChange?: (activeKeys: string[], soloedTraceKey?: string) => void;
+  /** Whether this empire has territory data, to show the outline toggle at all. */
+  showTerritoryToggle?: boolean;
+  /** Whether the territory outline checkbox starts checked. Defaults to true. */
+  initialTerritoryVisible?: boolean;
+  /** Called when the territory outline checkbox is toggled. */
+  onTerritoryVisibilityChange?: (visible: boolean) => void;
 };
 
 /**
@@ -55,6 +61,9 @@ export function createLegend(
     createLegend(empire, meshHandles, empires, onJumpToEmpire, {
       initialActiveKeys: [category.key],
       onVisibilityChange: options.onVisibilityChange,
+      showTerritoryToggle: options.showTerritoryToggle,
+      initialTerritoryVisible: options.initialTerritoryVisible,
+      onTerritoryVisibilityChange: options.onTerritoryVisibilityChange,
     });
     options.onVisibilityChange?.([category.key], category.traceKey);
   }
@@ -96,6 +105,31 @@ export function createLegend(
 
   header.append(headerText, chevron);
   panel.appendChild(header);
+
+  if (options.showTerritoryToggle) {
+    const territoryRow = document.createElement("div");
+    territoryRow.className = "trade-legend__territory";
+
+    const label = document.createElement("label");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = options.initialTerritoryVisible ?? true;
+    checkbox.addEventListener("change", () => {
+      options.onTerritoryVisibilityChange?.(checkbox.checked);
+    });
+
+    const swatch = document.createElement("span");
+    swatch.className = "trade-legend__territory-swatch";
+
+    const text = document.createElement("span");
+    text.className = "trade-legend__territory-text";
+    text.textContent = "Empire territory";
+
+    label.append(checkbox, swatch, text);
+    territoryRow.appendChild(label);
+    panel.appendChild(territoryRow);
+  }
 
   const list = document.createElement("ul");
   list.className = "trade-legend__list";

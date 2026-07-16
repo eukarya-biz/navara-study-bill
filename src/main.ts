@@ -6,7 +6,7 @@ import ThreeView, {
   type MeshHandle,
 } from "@navara/three";
 import { DefaultDescriptions, DefaultPlugin } from "@navara/three_default_plugin";
-import type { ArclineMeshDesc } from "@navara/three_default_descs";
+import type { AmbientLightDesc, ArclineMeshDesc } from "@navara/three_default_descs";
 import { AttributionPlugin } from "@navara/three_plugins";
 import { empires } from "./data/empires";
 import type { Empire } from "./data/types";
@@ -33,6 +33,10 @@ await view.init();
 // Setup scene
 defaultPlugin.addDefaultPhotorealScene();
 
+view.addLight<AmbientLightDesc>({
+  ambient: { intensity: 20, color: new Color().setHex(0xffffff) },
+});
+
 view.atmosphere.date.setHours(8);
 view.toneMappingExposure = 1.2;
 
@@ -50,19 +54,19 @@ view.addLayer({
   raster: {},
 });
 
-// const terrain = view.addSource({
-//   type: "quantized-mesh",
-//   url: "https://terrain.reearth.land/cesium-mesh/ellipsoid/{z}/{x}/{y}.terrain",
-//   maxZoom: 18,
-//   requestVertexNormals: true,
-//   requestWaterMask: true,
-// });
+const terrain = view.addSource({
+  type: "quantized-mesh",
+  url: "https://terrain.reearth.land/cesium-mesh/ellipsoid/{z}/{x}/{y}.terrain",
+  maxZoom: 18,
+  requestVertexNormals: true,
+  requestWaterMask: true,
+});
 
-// view.addLayer({
-//   type: "terrain",
-//   source: terrain,
-//   terrain: {},
-// });
+view.addLayer({
+  type: "terrain",
+  source: terrain,
+  terrain: {},
+});
 
 // Trade route visualization
 
@@ -81,10 +85,28 @@ const DASH_FLOW_SPEED = 60_000; // meters per second
 let arcMeshHandles = new Map<string, MeshHandle<ArclineMeshDesc>>();
 let cityPointsLayer: Layer | undefined;
 let cityLabelsLayer: Layer | undefined;
+let territoryLayer: Layer | undefined;
 
 let pendingActiveKeys: string[] | undefined;
 
 let currentTraceKey: string | undefined;
+
+// Whether the territory outline is shown, carried across empire switches
+// (like currentTraceKey) so the user's toggle choice persists.
+let territoryVisible = true;
+
+const TERRITORY_COLOR = 0xd4af6e;
+
+function buildTerritoryFeatureCollection(territory: Empire["territory"]) {
+  return {
+    type: "FeatureCollection" as const,
+    features: (territory ?? []).map((ring) => ({
+      type: "Feature" as const,
+      properties: {},
+      geometry: { type: "LineString" as const, coordinates: [...ring, ring[0]] },
+    })),
+  };
+}
 
 function toLatLng(cityById: Map<string, { lat: number; lng: number }>, cityId: string): LatLng {
   const city = cityById.get(cityId);
@@ -99,8 +121,10 @@ function clearEmpireScene() {
   arcMeshHandles = new Map();
   cityPointsLayer?.delete();
   cityLabelsLayer?.delete();
+  territoryLayer?.delete();
   cityPointsLayer = undefined;
   cityLabelsLayer = undefined;
+  territoryLayer = undefined;
 }
 
 // Pins the camera to wherever it currently is, discarding any in-progress
@@ -220,6 +244,19 @@ function loadEmpire(empire: Empire) {
     }));
   });
 
+  territoryLayer = empire.territory
+    ? view.addLayer({
+        type: "geojson",
+        data: buildTerritoryFeatureCollection(empire.territory),
+        polyline: {
+          color: new Color().setHex(TERRITORY_COLOR),
+          width: 2,
+          clampToGround: true,
+          show: territoryVisible,
+        },
+      })
+    : undefined;
+
   const activeKeys = resolveActiveKeys(empire);
 
   createLegend(empire, arcMeshHandles, empires, jumpToEmpireWithTrace, {
@@ -227,6 +264,21 @@ function loadEmpire(empire: Empire) {
     onVisibilityChange: (keys, soloedTraceKey) => {
       currentTraceKey = soloedTraceKey;
       writeUrlState({ empireId: empire.id, categoryKeys: keys });
+    },
+    showTerritoryToggle: !!empire.territory,
+    initialTerritoryVisible: territoryVisible,
+    onTerritoryVisibilityChange: (visible) => {
+      territoryVisible = visible;
+      territoryLayer?.update({
+        type: "geojson",
+        data: buildTerritoryFeatureCollection(empire.territory),
+        polyline: {
+          color: new Color().setHex(TERRITORY_COLOR),
+          width: 2,
+          clampToGround: true,
+          show: visible,
+        },
+      });
     },
   });
   createTimelineScrubber(empires, empire.id, loadEmpire);
@@ -290,5 +342,9 @@ attribution.show([
   {
     attributionHtml: `Basemap by <a href="https://carto.com/attributions">CARTO</a>, data by <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>`,
     attributionUrl: "https://carto.com/attributions",
+  },
+  {
+    attributionHtml: `Territory outlines from <a href="https://github.com/aourednik/historical-basemaps">historical-basemaps</a> (GPL-3.0)`,
+    attributionUrl: "https://github.com/aourednik/historical-basemaps",
   },
 ]);

@@ -30,12 +30,14 @@ engine.
 - **Timeline scrubber** (bottom) switches between empires - drag it or tap
   an era label, and the camera flies to frame that empire's cities while
   the map rebuilds its routes.
-- **Legend** (top-right) lists each empire's trade goods with a color swatch;
-  untick one to hide that category's routes. Tap the header to
-  collapse/expand it (collapsed by default on small screens). The **trace**
-  button on a row isolates that good and, if any other empire traded the
-  same good, lists them below so you can jump straight to that empire with
-  the matching good already isolated.
+- **Legend** (top-right) has an **Empire territory** toggle above the goods
+  list, which shows or hides a dashed outline of the empire's extent at its
+  peak, and then lists each trade good with a color swatch; untick one to
+  hide that category's routes. Tap the header to collapse/expand it
+  (collapsed by default on small screens). The **trace** button on a row
+  isolates that good and, if any other empire traded the same good, lists
+  them below so you can jump straight to that empire with the matching good
+  already isolated.
 - **Click a city marker** to open a card listing every trade route running
   through it; click elsewhere on the globe to close it.
 - The current empire and active goods are reflected in the URL, so a
@@ -92,6 +94,13 @@ framing - is generated from that data automatically.
 ## Tech
 
 - [Navara](https://navara-docs.netlify.app/) (`@navara/three`) for the 3D
-  globe, terrain-free dark basemap tiles from
+  globe, dark basemap tiles and terrain from
   [CARTO](https://carto.com/attributions) / [OpenStreetMap](https://www.openstreetmap.org/copyright),
   and the Cinzel / Inter type pairing from Google Fonts.
+- Empire territory outlines are real historical boundaries from
+  [historical-basemaps](https://github.com/aourednik/historical-basemaps)
+  (`world_100`/`world_800`/`world_1279`/`world_1800`/`world_1920.geojson`),
+  simplified for the globe. That dataset is **GPL-3.0 licensed** - the
+  `territory` field in each `src/data/*Empire.ts` file is a derivative of it
+  and carries the same license, independent of how the rest of this
+  repository is licensed.
