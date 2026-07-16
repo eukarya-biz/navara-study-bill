@@ -1,11 +1,7 @@
 import ThreeView, {
   Color,
-  eastNorthUpToFixedFrame,
-  EllipsoidGeodesic,
   fetchFontFamilyFromCss,
-  geodeticToVector3,
   type LatLng,
-  type LatLngHeight,
   type Layer,
   type MeshHandle,
 } from "@navara/three";
@@ -16,12 +12,20 @@ import type {
   InstancedGltfModelMeshDesc,
 } from "@navara/three_default_descs";
 import { AttributionPlugin } from "@navara/three_plugins";
-import { Matrix4, Vector3 } from "three";
 import { empires } from "./data/empires";
-import type { Empire, TradeRoute } from "./data/types";
+import type { Empire } from "./data/types";
 import { createLegend } from "./legend";
 import { createTimelineScrubber } from "./timelineScrubber";
 import { readInitialUrlState, writeUrlState } from "./urlState";
+import { flyToEmpireBounds } from "./utils/camera";
+import { toLatLng } from "./utils/geo";
+import { buildCityFeatureCollection, buildTerritoryFeatureCollection } from "./utils/geojson";
+import {
+  createRouteMarker,
+  disposeRouteMarkers,
+  updateRouteMarkers,
+  type RouteMarker,
+} from "./utils/routeMarkers";
 import shipModelUrl from "./assets/models/ship.glb?url";
 import camelModelUrl from "./assets/models/camel.glb?url";
 import "./style.css";
@@ -90,7 +94,6 @@ view.addFontFamily(fontFamily);
 const DASH_SIZE = 200_000; // meters
 const GAP_SIZE = 140_000; // meters
 const DASH_FLOW_SPEED = 60_000; // meters per second
-const DEG2RAD = Math.PI / 180;
 
 const shipMeshHandle = view.addMesh<InstancedGltfModelMeshDesc>({
   gltfModels: { url: shipModelUrl, children: [] },
@@ -117,35 +120,12 @@ const CAMEL_TARGET_LENGTH = 130_000;
 const CAMEL_NATIVE_LENGTH = 11.57;
 const CAMEL_SCALE = CAMEL_TARGET_LENGTH / CAMEL_NATIVE_LENGTH;
 
-const SHIP_FORWARD_SIGN = -1;
-const CAMEL_FORWARD_SIGN = 1;
-const MARKER_HEIGHT = 20_000; // meters above the ellipsoid, clear of terrain relief
 const MARKER_SPEED = DASH_FLOW_SPEED; // meters per second, matched to the dash flow
-const MARKER_LOOKAHEAD = 50_000; // meters, for estimating heading of travel
-
-type RouteMarker = {
-  categoryKey: string;
-  mesh: InstancedGltfModelMeshDesc;
-  index: number;
-  geodesic: EllipsoidGeodesic;
-  totalDistance: number;
-  phaseOffset: number;
-  baseScale: number;
-  forwardSign: number;
-  visible: boolean;
-};
 
 let routeMarkers: RouteMarker[] = [];
 
 let currentEmpire: Empire | undefined;
 let currentActiveKeys: string[] = [];
-
-function bearingBetween(from: LatLngHeight, to: LatLngHeight): number {
-  const dLng = to.lng - from.lng;
-  const y = Math.sin(dLng) * Math.cos(to.lat);
-  const x = Math.cos(from.lat) * Math.sin(to.lat) - Math.sin(from.lat) * Math.cos(to.lat) * Math.cos(dLng);
-  return Math.atan2(y, x);
-}
 
 // Mutable scene state for whichever empire is currently displayed. Swapping
 // empires tears these down and rebuilds them from the new dataset.
@@ -164,62 +144,9 @@ let territoryVisible = true;
 
 const TERRITORY_COLOR = 0xd4af6e;
 
-function buildTerritoryFeatureCollection(territory: Empire["territory"]) {
-  return {
-    type: "FeatureCollection" as const,
-    features: (territory ?? []).map((ring) => ({
-      type: "Feature" as const,
-      properties: {},
-      geometry: { type: "LineString" as const, coordinates: [...ring, ring[0]] },
-    })),
-  };
-}
-
-function toLatLng(cityById: Map<string, { lat: number; lng: number }>, cityId: string): LatLng {
-  const city = cityById.get(cityId);
-  if (!city) throw new Error(`Unknown city id: ${cityId}`);
-  return { lat: city.lat, lng: city.lng };
-}
-
-function toLatLngRad(cityById: Map<string, { lat: number; lng: number }>, cityId: string): LatLngHeight {
-  const city = cityById.get(cityId);
-  if (!city) throw new Error(`Unknown city id: ${cityId}`);
-  return { lat: city.lat * DEG2RAD, lng: city.lng * DEG2RAD, height: 0 };
-}
-
-function createRouteMarker(
-  cityById: Map<string, { lat: number; lng: number }>,
-  route: TradeRoute,
-  visible: boolean,
-): RouteMarker {
-  const geodesic = new EllipsoidGeodesic(
-    toLatLngRad(cityById, route.from),
-    toLatLngRad(cityById, route.to),
-  );
-  const mesh = route.mode === "sea" ? shipMeshHandle.ref : camelMeshHandle.ref;
-  const index = mesh.add({});
-  return {
-    categoryKey: route.category,
-    mesh,
-    index,
-    geodesic,
-    totalDistance: geodesic.distance,
-    // Stagger start position along the route so markers on the same route
-    // don't all bunch up at the same point.
-    phaseOffset: Math.random() * geodesic.distance,
-    baseScale: route.mode === "sea" ? SHIP_SCALE : CAMEL_SCALE,
-    forwardSign: route.mode === "sea" ? SHIP_FORWARD_SIGN : CAMEL_FORWARD_SIGN,
-    visible,
-  };
-}
-
 function clearRouteMarkers() {
-  for (const marker of routeMarkers) {
-    marker.geodesic.dispose();
-  }
+  disposeRouteMarkers(routeMarkers, { ship: shipMeshHandle.ref, camel: camelMeshHandle.ref });
   routeMarkers = [];
-  shipMeshHandle.ref.clear();
-  camelMeshHandle.ref.clear();
 }
 
 // (Re)builds routeMarkers for currentEmpire, skipping routes whose model
@@ -230,10 +157,14 @@ function syncRouteMarkers() {
   clearRouteMarkers();
 
   const cityById = new Map(currentEmpire.cities.map((city) => [city.id, city]));
+  const meshes = { ship: shipMeshHandle.ref, camel: camelMeshHandle.ref };
+  const scales = { ship: SHIP_SCALE, camel: CAMEL_SCALE };
   for (const route of currentEmpire.tradeRoutes) {
     if (route.mode === "sea" && !shipReady) continue;
     if (route.mode === "land" && !camelReady) continue;
-    routeMarkers.push(createRouteMarker(cityById, route, currentActiveKeys.includes(route.category)));
+    routeMarkers.push(
+      createRouteMarker(cityById, route, meshes, scales, currentActiveKeys.includes(route.category)),
+    );
   }
 }
 
@@ -250,43 +181,6 @@ function clearEmpireScene() {
   territoryLayer = undefined;
 
   clearRouteMarkers();
-}
-
-// Pins the camera to wherever it currently is, discarding any in-progress
-// flyTo animation. The engine has no direct "cancel flight" call, so without
-// this, switching empires mid-flight leaves the previous flight's target and
-// timing racing the new one instead of cleanly restarting.
-function stopCameraFlight() {
-  const position = view.camera.positionGeographic;
-  const orientation = view.camera.orientation;
-  view.setCamera({
-    lng: position.lng,
-    lat: position.lat,
-    height: position.height,
-    pitch: orientation.pitch,
-    heading: orientation.heading,
-    roll: orientation.roll,
-  });
-}
-
-function flyToEmpireBounds(empire: Empire) {
-  const lngs = empire.cities.map((city) => city.lng);
-  const lats = empire.cities.map((city) => city.lat);
-  const minLng = Math.min(...lngs);
-  const maxLng = Math.max(...lngs);
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
-
-  const centerLng = (minLng + maxLng) / 2;
-  const centerLat = (minLat + maxLat) / 2;
-  const spanDeg = Math.max(maxLng - minLng, maxLat - minLat);
-  const height = Math.min(9_000_000, Math.max(3_500_000, spanDeg * 130_000));
-
-  stopCameraFlight();
-  view.flyTo(
-    { lng: centerLng, lat: centerLat, height, pitch: -90, heading: 0 },
-    3000,
-  );
 }
 
 function loadEmpire(empire: Empire) {
@@ -333,14 +227,7 @@ function loadEmpire(empire: Empire) {
 
   // Two layers sharing the same GeoJSON data: one for the marker dot, one
   // for the name label, so both render independently of each other.
-  const cityFeatureCollection = {
-    type: "FeatureCollection" as const,
-    features: empire.cities.map((city) => ({
-      type: "Feature" as const,
-      properties: { name: city.name },
-      geometry: { type: "Point" as const, coordinates: [city.lng, city.lat] },
-    })),
-  };
+  const cityFeatureCollection = buildCityFeatureCollection(empire.cities);
 
   cityPointsLayer = view.addLayer({
     type: "geojson",
@@ -419,7 +306,7 @@ function loadEmpire(empire: Empire) {
   createTimelineScrubber(empires, empire.id, loadEmpire);
 
   writeUrlState({ empireId: empire.id, categoryKeys: activeKeys });
-  flyToEmpireBounds(empire);
+  flyToEmpireBounds(view, empire);
 }
 
 // Picks which categories should be active on load: an explicit one-off
@@ -447,13 +334,6 @@ function jumpToEmpireWithTrace(target: Empire, traceKey: string) {
   loadEmpire(target);
 }
 
-// Scratch objects reused every frame so animating markers doesn't allocate.
-const scratchRotation = new Matrix4();
-const scratchScale = new Matrix4();
-const scratchRight = new Vector3();
-const scratchUp = new Vector3(0, 0, 1);
-const scratchForward = new Vector3();
-
 // Animate the dash pattern flowing from source to target, like a flight-path
 // map, and slide each ship/camel marker along its route in step with it.
 view.on("preRender", (updatedAt) => {
@@ -463,30 +343,7 @@ view.on("preRender", (updatedAt) => {
     handle.update({ arcLines: [{ dashOffset }] });
   }
 
-  const elapsedMeters = elapsedSeconds * MARKER_SPEED;
-  for (const marker of routeMarkers) {
-    const distance = (elapsedMeters + marker.phaseOffset) % marker.totalDistance;
-    const lookaheadDistance = Math.min(distance + MARKER_LOOKAHEAD, marker.totalDistance);
-    const point = marker.geodesic.interpolateDistance(distance);
-    const lookahead = marker.geodesic.interpolateDistance(lookaheadDistance);
-    const heading = bearingBetween(point, lookahead);
-
-    const origin = geodeticToVector3({ lat: point.lat, lng: point.lng, height: MARKER_HEIGHT });
-    const enu = eastNorthUpToFixedFrame(origin);
-
-    const sinH = Math.sin(heading);
-    const cosH = Math.cos(heading);
-    const sign = marker.forwardSign;
-    scratchRight.set(-cosH * sign, sinH * sign, 0);
-    scratchForward.set(sinH * sign, cosH * sign, 0);
-    scratchRotation.makeBasis(scratchRight, scratchUp, scratchForward);
-
-    const scale = marker.visible ? marker.baseScale : 0;
-    scratchScale.makeScale(scale, scale, scale);
-
-    const matrix = enu.multiply(scratchRotation).multiply(scratchScale);
-    marker.mesh.updateAt(marker.index, { matrix });
-  }
+  updateRouteMarkers(routeMarkers, elapsedSeconds, MARKER_SPEED);
 });
 view.animation = true;
 
