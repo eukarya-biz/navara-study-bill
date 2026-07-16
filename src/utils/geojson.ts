@@ -16,7 +16,7 @@ export function buildCityFeatureCollection(cities: City[]) {
     type: "FeatureCollection" as const,
     features: cities.map((city) => ({
       type: "Feature" as const,
-      properties: { name: city.name },
+      properties: { id: city.id, name: city.name },
       geometry: { type: "Point" as const, coordinates: [city.lng, city.lat] },
     })),
   };

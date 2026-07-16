@@ -12,14 +12,19 @@ import type {
   InstancedGltfModelMeshDesc,
 } from "@navara/three_default_descs";
 import { AttributionPlugin } from "@navara/three_plugins";
+import { Vector3 } from "three";
 import { empires } from "./data/empires";
 import type { Empire } from "./data/types";
+import { closeCityCard, createCityCard } from "./cityCard";
 import { createLegend } from "./legend";
 import { createTimelineScrubber } from "./timelineScrubber";
 import { readInitialUrlState, writeUrlState } from "./urlState";
+import { hideRouteTooltip, showRouteTooltip } from "./routeTooltip";
 import { flyToEmpireBounds } from "./utils/camera";
+import { findRoutesForCity } from "./utils/cityRoutes";
 import { toLatLng } from "./utils/geo";
 import { buildCityFeatureCollection, buildTerritoryFeatureCollection } from "./utils/geojson";
+import { buildRouteHoverTargets, findHoveredRoute, type RouteHoverTarget } from "./utils/routeHover";
 import {
   createRouteMarker,
   disposeRouteMarkers,
@@ -123,6 +128,7 @@ const CAMEL_SCALE = CAMEL_TARGET_LENGTH / CAMEL_NATIVE_LENGTH;
 const MARKER_SPEED = DASH_FLOW_SPEED; // meters per second, matched to the dash flow
 
 let routeMarkers: RouteMarker[] = [];
+let routeHoverTargets: RouteHoverTarget[] = [];
 
 let currentEmpire: Empire | undefined;
 let currentActiveKeys: string[] = [];
@@ -185,6 +191,8 @@ function clearEmpireScene() {
 
 function loadEmpire(empire: Empire) {
   clearEmpireScene();
+  closeCityCard();
+  hideRouteTooltip();
 
   const cityById = new Map(empire.cities.map((city) => [city.id, city]));
   const activeKeys = resolveActiveKeys(empire);
@@ -223,6 +231,7 @@ function loadEmpire(empire: Empire) {
   // per-category checkboxes via onVisibilityChange.
   currentEmpire = empire;
   currentActiveKeys = activeKeys;
+  routeHoverTargets = buildRouteHoverTargets(empire);
   syncRouteMarkers();
 
   // Two layers sharing the same GeoJSON data: one for the marker dot, one
@@ -346,6 +355,65 @@ view.on("preRender", (updatedAt) => {
   updateRouteMarkers(routeMarkers, elapsedSeconds, MARKER_SPEED);
 });
 view.animation = true;
+
+// City click & route hover interactions
+
+const HOVER_PIXEL_RADIUS = 14; // CSS pixels
+const hoverScratch = new Vector3();
+
+view.on("mousemove", (event) => {
+  const canvas = event.target as HTMLElement | null;
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const screenX = event.clientX - rect.left;
+  const screenY = event.clientY - rect.top;
+
+  const visibleTargets = routeHoverTargets.filter((target) =>
+    currentActiveKeys.includes(target.categoryKey),
+  );
+  const hovered = findHoveredRoute(
+    visibleTargets,
+    screenX,
+    screenY,
+    view.camera.raw,
+    view.camera.raw.position,
+    view.screenSize.x,
+    view.screenSize.y,
+    HOVER_PIXEL_RADIUS,
+    hoverScratch,
+  );
+
+  if (hovered) {
+    showRouteTooltip(hovered, event.clientX, event.clientY);
+  } else {
+    hideRouteTooltip();
+  }
+});
+
+// Clicking a city marker or label opens a card listing every trade route
+// through it; clicking anything else (an empty patch of globe, an arc)
+// closes it, since `pick` fires with `null` when nothing was hit.
+view.on("pick", (info) => {
+  if (!info || !currentEmpire) {
+    closeCityCard();
+    return;
+  }
+  if (info.layerId !== cityPointsLayer?.id && info.layerId !== cityLabelsLayer?.id) {
+    closeCityCard();
+    return;
+  }
+
+  const cityId = info.properties?.id as string | undefined;
+  const city = cityId ? currentEmpire.cities.find((candidate) => candidate.id === cityId) : undefined;
+  if (!city) {
+    closeCityCard();
+    return;
+  }
+
+  const routes = findRoutesForCity(currentEmpire, city.id);
+  const categoriesByKey = new Map(currentEmpire.categories.map((category) => [category.key, category]));
+  createCityCard(city, routes, categoriesByKey);
+});
 
 const brand = document.createElement("div");
 brand.className = "app-brand";
