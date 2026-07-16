@@ -65,43 +65,43 @@ export const romanEmpire: Empire = {
 
   tradeRoutes: [
     // Grain (the Annona - Rome's state-subsidized grain dole)
-    { from: "alexandria", to: "roma", category: "grain" },
-    { from: "alexandria", to: "puteoli", category: "grain" },
-    { from: "carthago", to: "roma", category: "grain" },
-    { from: "syracusae", to: "roma", category: "grain" },
-    { from: "leptisMagna", to: "roma", category: "grain" },
+    { from: "alexandria", to: "roma", category: "grain", mode: "sea" },
+    { from: "alexandria", to: "puteoli", category: "grain", mode: "sea" },
+    { from: "carthago", to: "roma", category: "grain", mode: "sea" },
+    { from: "syracusae", to: "roma", category: "grain", mode: "sea" },
+    { from: "leptisMagna", to: "roma", category: "grain", mode: "sea" },
 
     // Wine & olive oil
-    { from: "gades", to: "roma", category: "wineOil" },
-    { from: "corduba", to: "roma", category: "wineOil" },
-    { from: "barcino", to: "roma", category: "wineOil" },
-    { from: "massilia", to: "lugdunum", category: "wineOil" },
-    { from: "gades", to: "londinium", category: "wineOil" },
+    { from: "gades", to: "roma", category: "wineOil", mode: "sea" },
+    { from: "corduba", to: "roma", category: "wineOil", mode: "land" },
+    { from: "barcino", to: "roma", category: "wineOil", mode: "sea" },
+    { from: "massilia", to: "lugdunum", category: "wineOil", mode: "land" },
+    { from: "gades", to: "londinium", category: "wineOil", mode: "sea" },
 
     // Garum (fermented fish sauce, a Roman culinary staple)
-    { from: "olisipo", to: "roma", category: "garum" },
-    { from: "leptisMagna", to: "roma", category: "garum" },
-    { from: "gades", to: "roma", category: "garum" },
+    { from: "olisipo", to: "roma", category: "garum", mode: "sea" },
+    { from: "leptisMagna", to: "roma", category: "garum", mode: "sea" },
+    { from: "gades", to: "roma", category: "garum", mode: "sea" },
 
     // Silk & spice (the eastern trade: Silk Road overland + Indian Ocean/Red Sea)
-    { from: "palmyra", to: "antiochia", category: "silkSpice" },
-    { from: "antiochia", to: "roma", category: "silkSpice" },
-    { from: "berenice", to: "alexandria", category: "silkSpice" },
-    { from: "alexandria", to: "roma", category: "silkSpice" },
-    { from: "petra", to: "antiochia", category: "silkSpice" },
-    { from: "petra", to: "alexandria", category: "silkSpice" },
+    { from: "palmyra", to: "antiochia", category: "silkSpice", mode: "land" },
+    { from: "antiochia", to: "roma", category: "silkSpice", mode: "sea" },
+    { from: "berenice", to: "alexandria", category: "silkSpice", mode: "land" },
+    { from: "alexandria", to: "roma", category: "silkSpice", mode: "sea" },
+    { from: "petra", to: "antiochia", category: "silkSpice", mode: "land" },
+    { from: "petra", to: "alexandria", category: "silkSpice", mode: "land" },
 
     // Metals & ore
-    { from: "londinium", to: "roma", category: "metals" },
-    { from: "corduba", to: "roma", category: "metals" },
-    { from: "coloniaAgrippina", to: "roma", category: "metals" },
+    { from: "londinium", to: "roma", category: "metals", mode: "sea" },
+    { from: "corduba", to: "roma", category: "metals", mode: "land" },
+    { from: "coloniaAgrippina", to: "roma", category: "metals", mode: "land" },
 
     // Marble & building stone
-    { from: "ephesus", to: "roma", category: "marble" },
-    { from: "byzantium", to: "roma", category: "marble" },
+    { from: "ephesus", to: "roma", category: "marble", mode: "sea" },
+    { from: "byzantium", to: "roma", category: "marble", mode: "sea" },
 
     // Textiles & dye
-    { from: "tyrus", to: "roma", category: "textileDye" },
-    { from: "corinthus", to: "roma", category: "textileDye" },
+    { from: "tyrus", to: "roma", category: "textileDye", mode: "sea" },
+    { from: "corinthus", to: "roma", category: "textileDye", mode: "sea" },
   ],
 };

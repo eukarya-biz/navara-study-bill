@@ -6,10 +6,11 @@ Pax Atlas is an interactive 3D globe that visualizes how goods moved across
 five historical empires at their territorial or cultural peak - Rome, the
 Abbasid Caliphate, the Mongols, Qing China, and the British Empire. Trade
 routes are drawn as animated, color-coded geodesic arcs (in the style of a
-flight-path map), with city markers, name labels, a toggleable legend per
-trade good, and a timeline scrubber to move between empires. Click a city to
-see the routes running through it, or trace a single good to find which
-other empires also traded it.
+flight-path map) with a ship or camel caravan animating along each one
+depending on whether that leg moved by sea or overland, with city markers,
+name labels, a toggleable legend per trade good, and a timeline scrubber to
+move between empires. Click a city to see the routes running through it, or
+trace a single good to find which other empires also traded it.
 
 Built on [Navara](https://navara-docs.netlify.app/), Re:Earth's WebGL globe
 engine.
@@ -64,11 +65,14 @@ Pushes to `main` deploy automatically to GitHub Pages (see
 
 ```
 src/
-  main.ts              # scene setup: basemap, arc-line meshes, city layers,
-                        # camera framing, and wiring for the UI below
+  main.ts              # scene setup: basemap, terrain, arc-line meshes,
+                        # ship/camel markers, city layers, camera framing,
+                        # and wiring for the UI below
   legend.ts             # floating legend panel (per-category toggle)
   empireSwitcher.ts      # bottom tab bar for switching the active empire
   style.css             # UI styling (dark, mobile-friendly)
+  assets/
+    models/             # ship.glb / camel.glb (see Tech for license/credit)
   data/
     types.ts            # shared City / TradeCategory / TradeRoute / Empire types
     romanEmpire.ts
@@ -85,11 +89,12 @@ src/
    an id, display name, a `period` caption, a list of `cities`
    (`id`, `name`, `lng`, `lat`), a list of `categories` (goods, each with a
    color and an `arcHeightScale` so overlapping routes fan out visually), and
-   a list of `tradeRoutes` (`from` / `to` city ids + `category` key).
+   a list of `tradeRoutes` (`from` / `to` city ids, a `category` key, and a
+   `mode` of `"sea"` or `"land"` picking which animates along the arc).
 2. Register it in `src/data/empires.ts`'s `empires` array.
 
-Everything else - the arc meshes, city markers/labels, legend, and camera
-framing - is generated from that data automatically.
+Everything else - the arc meshes, ship/camel markers, city markers/labels,
+legend, and camera framing - is generated from that data automatically.
 
 ## Tech
 
@@ -104,3 +109,9 @@ framing - is generated from that data automatically.
   `territory` field in each `src/data/*Empire.ts` file is a derivative of it
   and carries the same license, independent of how the rest of this
   repository is licensed.
+- The ship (`src/assets/models/ship.glb`) and camel
+  (`src/assets/models/camel.glb`) models are from
+  [Poly Pizza](https://poly.pizza): the ship by
+  [Kenney](https://poly.pizza/m/SPxFN3Oazd) (CC0), the camel by
+  [jeremy](https://poly.pizza/m/9mu4MbU4QtJ) (CC BY 3.0, attribution
+  required).

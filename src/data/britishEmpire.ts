@@ -125,42 +125,42 @@ export const britishEmpire: Empire = {
 
   tradeRoutes: [
     // Tea
-    { from: "shanghai", to: "london", category: "tea" },
-    { from: "colombo", to: "london", category: "tea" },
-    { from: "calcutta", to: "london", category: "tea" },
+    { from: "shanghai", to: "london", category: "tea", mode: "sea" },
+    { from: "colombo", to: "london", category: "tea", mode: "sea" },
+    { from: "calcutta", to: "london", category: "tea", mode: "sea" },
 
     // Cotton & textiles
-    { from: "bombay", to: "liverpool", category: "cottonTextiles" },
-    { from: "cairo", to: "liverpool", category: "cottonTextiles" },
-    { from: "liverpool", to: "calcutta", category: "cottonTextiles" },
+    { from: "bombay", to: "liverpool", category: "cottonTextiles", mode: "sea" },
+    { from: "cairo", to: "liverpool", category: "cottonTextiles", mode: "sea" },
+    { from: "liverpool", to: "calcutta", category: "cottonTextiles", mode: "sea" },
 
     // Wool
-    { from: "sydney", to: "london", category: "wool" },
-    { from: "wellington", to: "london", category: "wool" },
+    { from: "sydney", to: "london", category: "wool", mode: "sea" },
+    { from: "wellington", to: "london", category: "wool", mode: "sea" },
 
     // Gold & diamonds
-    { from: "capeTown", to: "london", category: "goldDiamonds" },
+    { from: "capeTown", to: "london", category: "goldDiamonds", mode: "sea" },
 
     // Rubber, tin & spice
-    { from: "singapore", to: "london", category: "rubberTinSpice" },
-    { from: "rangoon", to: "london", category: "rubberTinSpice" },
-    { from: "colombo", to: "london", category: "rubberTinSpice" },
+    { from: "singapore", to: "london", category: "rubberTinSpice", mode: "sea" },
+    { from: "rangoon", to: "london", category: "rubberTinSpice", mode: "sea" },
+    { from: "colombo", to: "london", category: "rubberTinSpice", mode: "sea" },
 
     // Opium (India to China, the trade that precipitated the Opium Wars)
-    { from: "calcutta", to: "hongKong", category: "opium" },
-    { from: "bombay", to: "hongKong", category: "opium" },
-    { from: "hongKong", to: "shanghai", category: "opium" },
+    { from: "calcutta", to: "hongKong", category: "opium", mode: "sea" },
+    { from: "bombay", to: "hongKong", category: "opium", mode: "sea" },
+    { from: "hongKong", to: "shanghai", category: "opium", mode: "sea" },
 
     // Coal, powering the steamship network's coaling stations
-    { from: "cardiff", to: "gibraltar", category: "coal" },
-    { from: "cardiff", to: "malta", category: "coal" },
-    { from: "cardiff", to: "aden", category: "coal" },
-    { from: "cardiff", to: "suez", category: "coal" },
+    { from: "cardiff", to: "gibraltar", category: "coal", mode: "sea" },
+    { from: "cardiff", to: "malta", category: "coal", mode: "sea" },
+    { from: "cardiff", to: "aden", category: "coal", mode: "sea" },
+    { from: "cardiff", to: "suez", category: "coal", mode: "sea" },
 
     // Colonial produce
-    { from: "kingston", to: "london", category: "colonialProduce" },
-    { from: "halifax", to: "london", category: "colonialProduce" },
-    { from: "lagos", to: "liverpool", category: "colonialProduce" },
-    { from: "mombasa", to: "london", category: "colonialProduce" },
+    { from: "kingston", to: "london", category: "colonialProduce", mode: "sea" },
+    { from: "halifax", to: "london", category: "colonialProduce", mode: "sea" },
+    { from: "lagos", to: "liverpool", category: "colonialProduce", mode: "sea" },
+    { from: "mombasa", to: "london", category: "colonialProduce", mode: "sea" },
   ],
 };

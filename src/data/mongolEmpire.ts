@@ -53,42 +53,42 @@ export const mongolEmpire: Empire = {
 
   tradeRoutes: [
     // Silk & textiles
-    { from: "hangzhou", to: "khanbaliq", category: "silkTextiles" },
-    { from: "khanbaliq", to: "karakorum", category: "silkTextiles" },
-    { from: "karakorum", to: "samarkand", category: "silkTextiles" },
-    { from: "samarkand", to: "baghdad", category: "silkTextiles" },
-    { from: "baghdad", to: "tabriz", category: "silkTextiles" },
+    { from: "hangzhou", to: "khanbaliq", category: "silkTextiles", mode: "land" },
+    { from: "khanbaliq", to: "karakorum", category: "silkTextiles", mode: "land" },
+    { from: "karakorum", to: "samarkand", category: "silkTextiles", mode: "land" },
+    { from: "samarkand", to: "baghdad", category: "silkTextiles", mode: "land" },
+    { from: "baghdad", to: "tabriz", category: "silkTextiles", mode: "land" },
 
     // Spices & incense
-    { from: "quanzhou", to: "guangzhou", category: "spicesIncense" },
-    { from: "guangzhou", to: "kashgar", category: "spicesIncense" },
-    { from: "kashgar", to: "samarkand", category: "spicesIncense" },
-    { from: "tabriz", to: "sarai", category: "spicesIncense" },
+    { from: "quanzhou", to: "guangzhou", category: "spicesIncense", mode: "sea" },
+    { from: "guangzhou", to: "kashgar", category: "spicesIncense", mode: "land" },
+    { from: "kashgar", to: "samarkand", category: "spicesIncense", mode: "land" },
+    { from: "tabriz", to: "sarai", category: "spicesIncense", mode: "land" },
 
     // Paper & printing
-    { from: "khanbaliq", to: "kashgar", category: "paperPrinting" },
-    { from: "kashgar", to: "bukhara", category: "paperPrinting" },
-    { from: "bukhara", to: "baghdad", category: "paperPrinting" },
+    { from: "khanbaliq", to: "kashgar", category: "paperPrinting", mode: "land" },
+    { from: "kashgar", to: "bukhara", category: "paperPrinting", mode: "land" },
+    { from: "bukhara", to: "baghdad", category: "paperPrinting", mode: "land" },
 
     // Horses & livestock
-    { from: "karakorum", to: "kashgar", category: "horsesLivestock" },
-    { from: "kashgar", to: "balkh", category: "horsesLivestock" },
-    { from: "balkh", to: "samarkand", category: "horsesLivestock" },
-    { from: "almaliq", to: "kashgar", category: "horsesLivestock" },
+    { from: "karakorum", to: "kashgar", category: "horsesLivestock", mode: "land" },
+    { from: "kashgar", to: "balkh", category: "horsesLivestock", mode: "land" },
+    { from: "balkh", to: "samarkand", category: "horsesLivestock", mode: "land" },
+    { from: "almaliq", to: "kashgar", category: "horsesLivestock", mode: "land" },
 
     // Furs
-    { from: "novgorod", to: "sarai", category: "furs" },
-    { from: "sarai", to: "samarkand", category: "furs" },
-    { from: "kiev", to: "sarai", category: "furs" },
+    { from: "novgorod", to: "sarai", category: "furs", mode: "land" },
+    { from: "sarai", to: "samarkand", category: "furs", mode: "land" },
+    { from: "kiev", to: "sarai", category: "furs", mode: "land" },
 
     // Precious metals & gems
-    { from: "balkh", to: "baghdad", category: "preciousMetals" },
-    { from: "baghdad", to: "tabriz", category: "preciousMetals" },
-    { from: "tabriz", to: "sarai", category: "preciousMetals" },
+    { from: "balkh", to: "baghdad", category: "preciousMetals", mode: "land" },
+    { from: "baghdad", to: "tabriz", category: "preciousMetals", mode: "land" },
+    { from: "tabriz", to: "sarai", category: "preciousMetals", mode: "land" },
 
-    // Porcelain & ceramics
-    { from: "hangzhou", to: "quanzhou", category: "porcelain" },
-    { from: "quanzhou", to: "baghdad", category: "porcelain" },
-    { from: "guangzhou", to: "baghdad", category: "porcelain" },
+    // Porcelain & ceramics (fragile cargo, moved mostly by the maritime route)
+    { from: "hangzhou", to: "quanzhou", category: "porcelain", mode: "sea" },
+    { from: "quanzhou", to: "baghdad", category: "porcelain", mode: "sea" },
+    { from: "guangzhou", to: "baghdad", category: "porcelain", mode: "sea" },
   ],
 };

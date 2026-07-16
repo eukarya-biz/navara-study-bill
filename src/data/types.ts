@@ -18,6 +18,8 @@ export type TradeRoute = {
   from: string;
   to: string;
   category: string;
+  /** Whether this leg moved by ship or overland caravan - drives which model animates along the arc. */
+  mode: "sea" | "land";
 };
 
 export type TerritoryRing = [number, number][];

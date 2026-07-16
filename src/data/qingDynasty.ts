@@ -46,35 +46,35 @@ export const qingDynasty: Empire = {
 
   tradeRoutes: [
     // Tea
-    { from: "hangzhou", to: "guangzhou", category: "tea" },
-    { from: "guangzhou", to: "macau", category: "tea" },
-    { from: "suzhou", to: "kyakhta", category: "tea" },
+    { from: "hangzhou", to: "guangzhou", category: "tea", mode: "sea" },
+    { from: "guangzhou", to: "macau", category: "tea", mode: "sea" },
+    { from: "suzhou", to: "kyakhta", category: "tea", mode: "land" },
 
     // Silk
-    { from: "suzhou", to: "guangzhou", category: "silk" },
-    { from: "hangzhou", to: "nanjing", category: "silk" },
-    { from: "nanjing", to: "beijing", category: "silk" },
+    { from: "suzhou", to: "guangzhou", category: "silk", mode: "sea" },
+    { from: "hangzhou", to: "nanjing", category: "silk", mode: "land" },
+    { from: "nanjing", to: "beijing", category: "silk", mode: "land" },
 
     // Porcelain
-    { from: "jingdezhen", to: "guangzhou", category: "porcelain" },
-    { from: "jingdezhen", to: "nanjing", category: "porcelain" },
-    { from: "guangzhou", to: "macau", category: "porcelain" },
+    { from: "jingdezhen", to: "guangzhou", category: "porcelain", mode: "land" },
+    { from: "jingdezhen", to: "nanjing", category: "porcelain", mode: "land" },
+    { from: "guangzhou", to: "macau", category: "porcelain", mode: "sea" },
 
     // Silver (the Manila galleon trade and Nagasaki trade)
-    { from: "manila", to: "guangzhou", category: "silver" },
-    { from: "macau", to: "guangzhou", category: "silver" },
-    { from: "nagasaki", to: "guangzhou", category: "silver" },
+    { from: "manila", to: "guangzhou", category: "silver", mode: "sea" },
+    { from: "macau", to: "guangzhou", category: "silver", mode: "sea" },
+    { from: "nagasaki", to: "guangzhou", category: "silver", mode: "sea" },
 
     // Cotton & textiles
-    { from: "shanghai", to: "guangzhou", category: "cottonTextiles" },
-    { from: "nanjing", to: "shanghai", category: "cottonTextiles" },
+    { from: "shanghai", to: "guangzhou", category: "cottonTextiles", mode: "sea" },
+    { from: "nanjing", to: "shanghai", category: "cottonTextiles", mode: "land" },
 
     // Jade & gems
-    { from: "kashgar", to: "beijing", category: "jadeGems" },
-    { from: "lhasa", to: "beijing", category: "jadeGems" },
+    { from: "kashgar", to: "beijing", category: "jadeGems", mode: "land" },
+    { from: "lhasa", to: "beijing", category: "jadeGems", mode: "land" },
 
     // Furs
-    { from: "urga", to: "beijing", category: "furs" },
-    { from: "kyakhta", to: "beijing", category: "furs" },
+    { from: "urga", to: "beijing", category: "furs", mode: "land" },
+    { from: "kyakhta", to: "beijing", category: "furs", mode: "land" },
   ],
 };

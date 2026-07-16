@@ -46,37 +46,37 @@ export const abbasidCaliphate: Empire = {
 
   tradeRoutes: [
     // Spices (Indian Ocean trade via the Persian Gulf)
-    { from: "siraf", to: "basra", category: "spices" },
-    { from: "basra", to: "baghdad", category: "spices" },
-    { from: "mogadishu", to: "siraf", category: "spices" },
+    { from: "siraf", to: "basra", category: "spices", mode: "sea" },
+    { from: "basra", to: "baghdad", category: "spices", mode: "sea" },
+    { from: "mogadishu", to: "siraf", category: "spices", mode: "sea" },
 
     // Silk
-    { from: "guangzhou", to: "siraf", category: "silk" },
-    { from: "samarkand", to: "baghdad", category: "silk" },
-    { from: "baghdad", to: "constantinople", category: "silk" },
+    { from: "guangzhou", to: "siraf", category: "silk", mode: "sea" },
+    { from: "samarkand", to: "baghdad", category: "silk", mode: "land" },
+    { from: "baghdad", to: "constantinople", category: "silk", mode: "land" },
 
     // Paper (the spread of papermaking after the Battle of Talas, 751 AD)
-    { from: "samarkand", to: "bukhara", category: "paper" },
-    { from: "bukhara", to: "merv", category: "paper" },
-    { from: "merv", to: "baghdad", category: "paper" },
+    { from: "samarkand", to: "bukhara", category: "paper", mode: "land" },
+    { from: "bukhara", to: "merv", category: "paper", mode: "land" },
+    { from: "merv", to: "baghdad", category: "paper", mode: "land" },
 
     // Frankincense & myrrh (the ancient South Arabian incense route)
-    { from: "sanaa", to: "mecca", category: "frankincenseMyrrh" },
-    { from: "mecca", to: "damascus", category: "frankincenseMyrrh" },
-    { from: "damascus", to: "baghdad", category: "frankincenseMyrrh" },
+    { from: "sanaa", to: "mecca", category: "frankincenseMyrrh", mode: "land" },
+    { from: "mecca", to: "damascus", category: "frankincenseMyrrh", mode: "land" },
+    { from: "damascus", to: "baghdad", category: "frankincenseMyrrh", mode: "land" },
 
     // Glass & ceramics
-    { from: "damascus", to: "baghdad", category: "glassCeramics" },
-    { from: "alexandria", to: "baghdad", category: "glassCeramics" },
-    { from: "baghdad", to: "siraf", category: "glassCeramics" },
+    { from: "damascus", to: "baghdad", category: "glassCeramics", mode: "land" },
+    { from: "alexandria", to: "baghdad", category: "glassCeramics", mode: "land" },
+    { from: "baghdad", to: "siraf", category: "glassCeramics", mode: "sea" },
 
     // Textiles
-    { from: "cairo", to: "alexandria", category: "textiles" },
-    { from: "kairouan", to: "alexandria", category: "textiles" },
-    { from: "merv", to: "baghdad", category: "textiles" },
+    { from: "cairo", to: "alexandria", category: "textiles", mode: "land" },
+    { from: "kairouan", to: "alexandria", category: "textiles", mode: "sea" },
+    { from: "merv", to: "baghdad", category: "textiles", mode: "land" },
 
     // East African trade
-    { from: "mogadishu", to: "basra", category: "eastAfrica" },
-    { from: "mogadishu", to: "siraf", category: "eastAfrica" },
+    { from: "mogadishu", to: "basra", category: "eastAfrica", mode: "sea" },
+    { from: "mogadishu", to: "siraf", category: "eastAfrica", mode: "sea" },
   ],
 };
