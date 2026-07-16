@@ -7,7 +7,9 @@ five historical empires at their territorial or cultural peak - Rome, the
 Abbasid Caliphate, the Mongols, Qing China, and the British Empire. Trade
 routes are drawn as animated, color-coded geodesic arcs (in the style of a
 flight-path map), with city markers, name labels, a toggleable legend per
-trade good, and a switcher to jump between empires.
+trade good, and a timeline scrubber to move between empires. Click a city to
+see the routes running through it, or trace a single good to find which
+other empires also traded it.
 
 Built on [Navara](https://navara-docs.netlify.app/), Re:Earth's WebGL globe
 engine.
@@ -25,11 +27,19 @@ engine.
 ## Controls
 
 - **Drag** to rotate the globe, **scroll / pinch** to zoom.
-- **Bottom tab bar** switches between empires - the camera flies to frame
-  that empire's cities and the map rebuilds its routes.
+- **Timeline scrubber** (bottom) switches between empires - drag it or tap
+  an era label, and the camera flies to frame that empire's cities while
+  the map rebuilds its routes.
 - **Legend** (top-right) lists each empire's trade goods with a color swatch;
   untick one to hide that category's routes. Tap the header to
-  collapse/expand it (collapsed by default on small screens).
+  collapse/expand it (collapsed by default on small screens). The **trace**
+  button on a row isolates that good and, if any other empire traded the
+  same good, lists them below so you can jump straight to that empire with
+  the matching good already isolated.
+- **Click a city marker** to open a card listing every trade route running
+  through it; click elsewhere on the globe to close it.
+- The current empire and active goods are reflected in the URL, so a
+  specific view can be bookmarked or shared.
 
 ## Getting started
 

@@ -35,10 +35,10 @@ export const britishEmpire: Empire = {
   ],
 
   categories: [
-    { key: "tea", label: "Tea", good: "Tea from China, India and Ceylon", color: 0x4caf50, arcHeightScale: 0.22 },
-    { key: "cottonTextiles", label: "Cotton & Textiles", good: "Raw cotton and Lancashire cloth", color: 0xd9a441, arcHeightScale: 0.28 },
+    { key: "tea", label: "Tea", good: "Tea from China, India and Ceylon", color: 0x4caf50, arcHeightScale: 0.22, traceKey: "tea" },
+    { key: "cottonTextiles", label: "Cotton & Textiles", good: "Raw cotton and Lancashire cloth", color: 0xd9a441, arcHeightScale: 0.28, traceKey: "textiles" },
     { key: "wool", label: "Wool", good: "Wool from Australia and New Zealand", color: 0xb0bec5, arcHeightScale: 0.34 },
-    { key: "goldDiamonds", label: "Gold & Diamonds", good: "Gold and diamonds from Southern Africa", color: 0xffb300, arcHeightScale: 0.4 },
+    { key: "goldDiamonds", label: "Gold & Diamonds", good: "Gold and diamonds from Southern Africa", color: 0xffb300, arcHeightScale: 0.4, traceKey: "metals" },
     { key: "rubberTinSpice", label: "Rubber, Tin & Spice", good: "Rubber, tin and spices from Malaya and Ceylon", color: 0x00695c, arcHeightScale: 0.46 },
     { key: "opium", label: "Opium", good: "Opium from India to China", color: 0x6a1b9a, arcHeightScale: 0.52 },
     { key: "coal", label: "Coal", good: "Coal supplying the imperial coaling stations", color: 0x37474f, arcHeightScale: 0.58 },

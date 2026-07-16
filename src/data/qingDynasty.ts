@@ -28,13 +28,13 @@ export const qingDynasty: Empire = {
   ],
 
   categories: [
-    { key: "tea", label: "Tea", good: "Tea, overland to Russia and by sea to Canton", color: 0x2e7d32, arcHeightScale: 0.22 },
-    { key: "silk", label: "Silk", good: "Silk from the Jiangnan weaving cities", color: 0xc2185b, arcHeightScale: 0.28 },
-    { key: "porcelain", label: "Porcelain", good: "Blue-and-white porcelain", color: 0x0288d1, arcHeightScale: 0.34 },
-    { key: "silver", label: "Silver", good: "Silver from the Manila galleon and Japan trades", color: 0xb0bec5, arcHeightScale: 0.4 },
-    { key: "cottonTextiles", label: "Cotton & Textiles", good: "Cotton cloth", color: 0xd9a441, arcHeightScale: 0.46 },
+    { key: "tea", label: "Tea", good: "Tea, overland to Russia and by sea to Canton", color: 0x2e7d32, arcHeightScale: 0.22, traceKey: "tea" },
+    { key: "silk", label: "Silk", good: "Silk from the Jiangnan weaving cities", color: 0xc2185b, arcHeightScale: 0.28, traceKey: "silk" },
+    { key: "porcelain", label: "Porcelain", good: "Blue-and-white porcelain", color: 0x0288d1, arcHeightScale: 0.34, traceKey: "porcelain" },
+    { key: "silver", label: "Silver", good: "Silver from the Manila galleon and Japan trades", color: 0xb0bec5, arcHeightScale: 0.4, traceKey: "metals" },
+    { key: "cottonTextiles", label: "Cotton & Textiles", good: "Cotton cloth", color: 0xd9a441, arcHeightScale: 0.46, traceKey: "textiles" },
     { key: "jadeGems", label: "Jade & Gems", good: "Jade from Khotan and Tibetan gemstones", color: 0x8e24aa, arcHeightScale: 0.52 },
-    { key: "furs", label: "Furs", good: "Furs from Mongolia and Manchuria", color: 0x5d4037, arcHeightScale: 0.58 },
+    { key: "furs", label: "Furs", good: "Furs from Mongolia and Manchuria", color: 0x5d4037, arcHeightScale: 0.58, traceKey: "furs" },
   ],
 
   tradeRoutes: [

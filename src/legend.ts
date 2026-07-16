@@ -1,25 +1,63 @@
-import type { MeshHandle } from "@navara/three";
-import type { ArclineMeshDesc } from "@navara/three_default_descs";
-
-import type { Empire } from "./data/types";
+import type { Empire, TradeCategory } from "./data/types";
 
 const LEGEND_ID = "trade-legend";
 
-function toCssHex(color: number): string {
+export function toCssHex(color: number): string {
   return `#${color.toString(16).padStart(6, "0")}`;
 }
 
+type VisibilityHandle = { visible: boolean };
+
+export type LegendOptions = {
+  /** Category keys visible on first render. Defaults to every category. */
+  initialActiveKeys?: string[];
+  /**
+   * Called whenever the set of visible categories changes. `soloedTraceKey`
+   * is set when the change came from the "trace" button (so the caller can
+   * keep tracing that good across empire switches), and undefined for plain
+   * checkbox toggles (a manual choice, not a trace).
+   */
+  onVisibilityChange?: (activeKeys: string[], soloedTraceKey?: string) => void;
+};
+
 /**
  * Renders a floating legend panel listing each trade-goods category with a
- * color swatch and a checkbox that toggles that category's arc-line mesh.
- * Replaces any previously rendered legend, so this can be called again each
- * time the active empire changes.
+ * color swatch, a checkbox that toggles its meshes, and a "solo" button that
+ * isolates it and surfaces which other empires traded the same good (via
+ * `traceKey`). Replaces any previously rendered legend, so this can be
+ * called again each time the active empire (or its active categories)
+ * changes.
  */
 export function createLegend(
   empire: Empire,
-  meshHandles: Map<string, MeshHandle<ArclineMeshDesc>>,
+  meshHandles: Map<string, VisibilityHandle>,
+  empires: Empire[],
+  onJumpToEmpire: (target: Empire, traceKey: string) => void,
+  options: LegendOptions = {},
 ): void {
   document.getElementById(LEGEND_ID)?.remove();
+
+  const activeKeys = new Set(
+    options.initialActiveKeys ?? empire.categories.map((category) => category.key),
+  );
+
+  function setVisible(key: string, visible: boolean) {
+    const handle = meshHandles.get(key);
+    if (handle) handle.visible = visible;
+  }
+
+  for (const category of empire.categories) {
+    setVisible(category.key, activeKeys.has(category.key));
+  }
+
+  function soloCategory(category: TradeCategory) {
+    setVisible(category.key, true);
+    createLegend(empire, meshHandles, empires, onJumpToEmpire, {
+      initialActiveKeys: [category.key],
+      onVisibilityChange: options.onVisibilityChange,
+    });
+    options.onVisibilityChange?.([category.key], category.traceKey);
+  }
 
   const panel = document.createElement("aside");
   panel.id = LEGEND_ID;
@@ -70,12 +108,12 @@ export function createLegend(
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.checked = true;
+    checkbox.checked = activeKeys.has(category.key);
     checkbox.addEventListener("change", () => {
-      const handle = meshHandles.get(category.key);
-      if (handle) {
-        handle.visible = checkbox.checked;
-      }
+      if (checkbox.checked) activeKeys.add(category.key);
+      else activeKeys.delete(category.key);
+      setVisible(category.key, checkbox.checked);
+      options.onVisibilityChange?.([...activeKeys], undefined);
     });
 
     const swatch = document.createElement("span");
@@ -96,9 +134,64 @@ export function createLegend(
     text.append(name, good);
     label.append(checkbox, swatch, text);
     item.appendChild(label);
+
+    const soloButton = document.createElement("button");
+    soloButton.type = "button";
+    soloButton.className = "trade-legend__solo";
+    soloButton.title = `Show only ${category.label}`;
+    soloButton.setAttribute("aria-label", `Show only ${category.label}`);
+    soloButton.textContent = "trace";
+    soloButton.addEventListener("click", () => soloCategory(category));
+    item.appendChild(soloButton);
+
     list.appendChild(item);
   }
 
   panel.appendChild(list);
+
+  // When exactly one category is active, surface other empires that trace
+  // to the same good - whether the user got here via the solo button or a
+  // cross-empire jump landed on a single pre-soloed category.
+  const soloedCategory =
+    activeKeys.size === 1
+      ? empire.categories.find((category) => activeKeys.has(category.key))
+      : undefined;
+
+  const matches = soloedCategory?.traceKey
+    ? empires.flatMap((other) => {
+        if (other.id === empire.id) return [];
+        const match = other.categories.find((c) => c.traceKey === soloedCategory.traceKey);
+        return match ? [{ empire: other, category: match }] : [];
+      })
+    : [];
+
+  if (matches.length > 0) {
+    const strip = document.createElement("div");
+    strip.className = "trade-legend__trace-strip";
+
+    const stripLabel = document.createElement("span");
+    stripLabel.className = "trade-legend__trace-strip-label";
+    stripLabel.textContent = "Also traded by";
+    strip.appendChild(stripLabel);
+
+    const chips = document.createElement("div");
+    chips.className = "trade-legend__trace-chips";
+
+    for (const { empire: otherEmpire, category: otherCategory } of matches) {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "trade-legend__trace-chip";
+      chip.textContent = otherEmpire.name;
+      chip.addEventListener("click", () => {
+        if (!otherCategory.traceKey) return;
+        onJumpToEmpire(otherEmpire, otherCategory.traceKey);
+      });
+      chips.appendChild(chip);
+    }
+
+    strip.appendChild(chips);
+    panel.appendChild(strip);
+  }
+
   document.body.appendChild(panel);
 }

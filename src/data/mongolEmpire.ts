@@ -29,13 +29,13 @@ export const mongolEmpire: Empire = {
   ],
 
   categories: [
-    { key: "silkTextiles", label: "Silk & Textiles", good: "Silk woven in China", color: 0xc2185b, arcHeightScale: 0.22 },
-    { key: "spicesIncense", label: "Spices & Incense", good: "Spices and incense via maritime and overland routes", color: 0xef6c00, arcHeightScale: 0.28 },
-    { key: "paperPrinting", label: "Paper & Printing", good: "Paper and printing technology", color: 0x1976d2, arcHeightScale: 0.34 },
+    { key: "silkTextiles", label: "Silk & Textiles", good: "Silk woven in China", color: 0xc2185b, arcHeightScale: 0.22, traceKey: "silk" },
+    { key: "spicesIncense", label: "Spices & Incense", good: "Spices and incense via maritime and overland routes", color: 0xef6c00, arcHeightScale: 0.28, traceKey: "spices" },
+    { key: "paperPrinting", label: "Paper & Printing", good: "Paper and printing technology", color: 0x1976d2, arcHeightScale: 0.34, traceKey: "paper" },
     { key: "horsesLivestock", label: "Horses & Livestock", good: "Steppe horses and livestock", color: 0x8d6e63, arcHeightScale: 0.4 },
-    { key: "furs", label: "Furs", good: "Furs from the Rus principalities and Siberia", color: 0x455a64, arcHeightScale: 0.46 },
-    { key: "preciousMetals", label: "Precious Metals & Gems", good: "Gold, silver and gemstones", color: 0xffd54f, arcHeightScale: 0.52 },
-    { key: "porcelain", label: "Porcelain & Ceramics", good: "Chinese porcelain", color: 0x00acc1, arcHeightScale: 0.58 },
+    { key: "furs", label: "Furs", good: "Furs from the Rus principalities and Siberia", color: 0x455a64, arcHeightScale: 0.46, traceKey: "furs" },
+    { key: "preciousMetals", label: "Precious Metals & Gems", good: "Gold, silver and gemstones", color: 0xffd54f, arcHeightScale: 0.52, traceKey: "metals" },
+    { key: "porcelain", label: "Porcelain & Ceramics", good: "Chinese porcelain", color: 0x00acc1, arcHeightScale: 0.58, traceKey: "porcelain" },
   ],
 
   tradeRoutes: [

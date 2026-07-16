@@ -29,12 +29,12 @@ export const abbasidCaliphate: Empire = {
   ],
 
   categories: [
-    { key: "spices", label: "Spices", good: "Spices via the Persian Gulf and Indian Ocean", color: 0xef6c00, arcHeightScale: 0.22 },
-    { key: "silk", label: "Silk", good: "Silk from Central Asia and China", color: 0xc2185b, arcHeightScale: 0.28 },
-    { key: "paper", label: "Paper", good: "Papermaking technology from China", color: 0x1976d2, arcHeightScale: 0.34 },
+    { key: "spices", label: "Spices", good: "Spices via the Persian Gulf and Indian Ocean", color: 0xef6c00, arcHeightScale: 0.22, traceKey: "spices" },
+    { key: "silk", label: "Silk", good: "Silk from Central Asia and China", color: 0xc2185b, arcHeightScale: 0.28, traceKey: "silk" },
+    { key: "paper", label: "Paper", good: "Papermaking technology from China", color: 0x1976d2, arcHeightScale: 0.34, traceKey: "paper" },
     { key: "frankincenseMyrrh", label: "Frankincense & Myrrh", good: "Incense from South Arabia", color: 0xbf6b4d, arcHeightScale: 0.4 },
     { key: "glassCeramics", label: "Glass & Ceramics", good: "Glassware and ceramics", color: 0x00acc1, arcHeightScale: 0.46 },
-    { key: "textiles", label: "Textiles", good: "Egyptian linen and Khorasani cotton", color: 0xd9a441, arcHeightScale: 0.52 },
+    { key: "textiles", label: "Textiles", good: "Egyptian linen and Khorasani cotton", color: 0xd9a441, arcHeightScale: 0.52, traceKey: "textiles" },
     { key: "eastAfrica", label: "East African Trade", good: "Ivory, gold and mangrove timber from the Swahili coast", color: 0x4e342e, arcHeightScale: 0.58 },
   ],
 

@@ -11,10 +11,12 @@ import { AttributionPlugin } from "@navara/three_plugins";
 import { empires } from "./data/empires";
 import type { Empire } from "./data/types";
 import { createLegend } from "./legend";
-import { createEmpireSwitcher } from "./empireSwitcher";
+import { createTimelineScrubber } from "./timelineScrubber";
+import { readInitialUrlState, writeUrlState } from "./urlState";
 import "./style.css";
 
 const view = new ThreeView<DefaultDescriptions>();
+(window as any).__view = view;
 
 // Plugins
 
@@ -79,6 +81,10 @@ const DASH_FLOW_SPEED = 60_000; // meters per second
 let arcMeshHandles = new Map<string, MeshHandle<ArclineMeshDesc>>();
 let cityPointsLayer: Layer | undefined;
 let cityLabelsLayer: Layer | undefined;
+
+let pendingActiveKeys: string[] | undefined;
+
+let currentTraceKey: string | undefined;
 
 function toLatLng(cityById: Map<string, { lat: number; lng: number }>, cityId: string): LatLng {
   const city = cityById.get(cityId);
@@ -214,8 +220,44 @@ function loadEmpire(empire: Empire) {
     }));
   });
 
-  createLegend(empire, arcMeshHandles);
+  const activeKeys = resolveActiveKeys(empire);
+
+  createLegend(empire, arcMeshHandles, empires, jumpToEmpireWithTrace, {
+    initialActiveKeys: activeKeys,
+    onVisibilityChange: (keys, soloedTraceKey) => {
+      currentTraceKey = soloedTraceKey;
+      writeUrlState({ empireId: empire.id, categoryKeys: keys });
+    },
+  });
+  createTimelineScrubber(empires, empire.id, loadEmpire);
+
+  writeUrlState({ empireId: empire.id, categoryKeys: activeKeys });
   flyToEmpireBounds(empire);
+}
+
+// Picks which categories should be active on load: an explicit one-off
+// override (initial URL state) wins first, then whichever category
+// currently traces to `currentTraceKey` (so tracing a good survives
+// switching empires), falling back to every category visible.
+function resolveActiveKeys(empire: Empire): string[] {
+  if (pendingActiveKeys) {
+    const keys = pendingActiveKeys;
+    pendingActiveKeys = undefined;
+    return keys;
+  }
+  if (currentTraceKey) {
+    const match = empire.categories.find((category) => category.traceKey === currentTraceKey);
+    if (match) return [match.key];
+  }
+  return empire.categories.map((category) => category.key);
+}
+
+// Jumps to another empire, tracing the given tag there too (via
+// resolveActiveKeys) so "Also traded by" chips land on the matching good
+// rather than the new empire's default fully-visible legend.
+function jumpToEmpireWithTrace(target: Empire, traceKey: string) {
+  currentTraceKey = traceKey;
+  loadEmpire(target);
 }
 
 // Animate the dash pattern flowing from source to target, like a flight-path map.
@@ -236,8 +278,11 @@ brand.innerHTML = `
 `;
 document.body.appendChild(brand);
 
-createEmpireSwitcher(empires, empires[0].id, loadEmpire);
-loadEmpire(empires[0]);
+const initialUrlState = readInitialUrlState();
+const initialEmpire =
+  empires.find((empire) => empire.id === initialUrlState.empireId) ?? empires[0];
+pendingActiveKeys = initialUrlState.categoryKeys;
+loadEmpire(initialEmpire);
 
 // Attribution
 

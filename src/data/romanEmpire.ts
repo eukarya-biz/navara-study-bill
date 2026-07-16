@@ -41,10 +41,10 @@ export const romanEmpire: Empire = {
     { key: "grain", label: "Grain", good: "Wheat (the Annona)", color: 0xf2c14e, arcHeightScale: 0.22 },
     { key: "wineOil", label: "Wine & Oil", good: "Wine and olive oil", color: 0xa4243b, arcHeightScale: 0.28 },
     { key: "garum", label: "Garum", good: "Fish sauce (garum)", color: 0x2a9d8f, arcHeightScale: 0.34 },
-    { key: "silkSpice", label: "Silk & Spice", good: "Silk, spices and incense", color: 0xd62839, arcHeightScale: 0.4 },
-    { key: "metals", label: "Metals & Ore", good: "Tin, silver, lead and copper", color: 0x8d99ae, arcHeightScale: 0.46 },
+    { key: "silkSpice", label: "Silk & Spice", good: "Silk, spices and incense", color: 0xd62839, arcHeightScale: 0.4, traceKey: "silk" },
+    { key: "metals", label: "Metals & Ore", good: "Tin, silver, lead and copper", color: 0x8d99ae, arcHeightScale: 0.46, traceKey: "metals" },
     { key: "marble", label: "Marble & Stone", good: "Marble and building stone", color: 0x90e0ef, arcHeightScale: 0.52 },
-    { key: "textileDye", label: "Textiles & Dye", good: "Wool, textiles and Tyrian purple", color: 0x7209b7, arcHeightScale: 0.58 },
+    { key: "textileDye", label: "Textiles & Dye", good: "Wool, textiles and Tyrian purple", color: 0x7209b7, arcHeightScale: 0.58, traceKey: "textiles" },
   ],
 
   tradeRoutes: [

@@ -11,6 +11,7 @@ export type TradeCategory = {
   good: string;
   color: number;
   arcHeightScale: number;
+  traceKey?: string;
 };
 
 export type TradeRoute = {
