@@ -117,7 +117,7 @@ const CAMEL_TARGET_LENGTH = 130_000;
 const CAMEL_NATIVE_LENGTH = 11.57;
 const CAMEL_SCALE = CAMEL_TARGET_LENGTH / CAMEL_NATIVE_LENGTH;
 
-const SHIP_FORWARD_SIGN = 1;
+const SHIP_FORWARD_SIGN = -1;
 const CAMEL_FORWARD_SIGN = 1;
 const MARKER_HEIGHT = 20_000; // meters above the ellipsoid, clear of terrain relief
 const MARKER_SPEED = DASH_FLOW_SPEED; // meters per second, matched to the dash flow
