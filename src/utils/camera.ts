@@ -1,4 +1,5 @@
 import type ThreeView from "@navaramap/three";
+import type { LatLng } from "@navaramap/three";
 import type { DefaultDescriptions } from "@navaramap/three-default-plugin";
 import type { Empire } from "../data/types";
 
@@ -20,7 +21,7 @@ export function stopCameraFlight(view: View): void {
   });
 }
 
-export function flyToEmpireBounds(view: View, empire: Empire): void {
+export function flyToEmpireBounds(view: View, empire: Empire): LatLng {
   const lngs = empire.cities.map((city) => city.lng);
   const lats = empire.cities.map((city) => city.lat);
   const minLng = Math.min(...lngs);
@@ -28,11 +29,11 @@ export function flyToEmpireBounds(view: View, empire: Empire): void {
   const minLat = Math.min(...lats);
   const maxLat = Math.max(...lats);
 
-  const centerLng = (minLng + maxLng) / 2;
-  const centerLat = (minLat + maxLat) / 2;
+  const center = { lng: (minLng + maxLng) / 2, lat: (minLat + maxLat) / 2 };
   const spanDeg = Math.max(maxLng - minLng, maxLat - minLat);
   const height = Math.min(9_000_000, Math.max(3_500_000, spanDeg * 130_000));
 
   stopCameraFlight(view);
-  view.flyTo({ lng: centerLng, lat: centerLat, height, pitch: -90, heading: 0 }, { duration: 3000 });
+  view.flyTo({ ...center, height, pitch: -90, heading: 0 }, { duration: 3000 });
+  return center;
 }

@@ -75,7 +75,10 @@ Everything lives under `src/`, driven by one imperative entry point,
    the legend can show/hide a whole good's routes via one handle), one route
    marker instance per trade route positioned along an `EllipsoidGeodesic`,
    a GeoJSON source of cities rendered by point and label `vector` layers,
-   and an optional territory outline source + layer.
+   and an optional territory outline source + layer. It then flies the
+   camera to frame the empire's cities and re-aims the sun to 08:00 local
+   solar time over that center (`atmosphere.setSolarTime`, from a base
+   instant pinned in UTC so lighting never depends on the device clock).
 4. Drives a `preRender` loop that animates the dash pattern flowing along
    each arc and slides every ship/camel instance along its geodesic in step
    with it (matched speed constants: `DASH_FLOW_SPEED` / `MARKER_SPEED`).

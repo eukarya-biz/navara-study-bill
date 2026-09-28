@@ -61,7 +61,13 @@ view.addLight<AmbientLightDesc>({
   ambient: { intensity: 20, color: new Color().setHex(0xffffff) },
 });
 
-view.atmosphere.date.setHours(8);
+// Pin the instant the sun is computed from, so lighting doesn't depend on the
+// device clock or timezone (a bare `setHours` would). An equinox keeps daylight
+// even across both hemispheres, which the empires span. loadEmpire() then
+// shifts within this solar day so the framed empire sits in morning light.
+view.atmosphere.date = new Date("2026-03-20T12:00:00Z");
+const MORNING_SOLAR_HOUR = 8;
+
 view.toneMappingExposure = 1.2;
 
 // Layer declarations
@@ -374,7 +380,8 @@ function loadEmpire(empire: Empire) {
   createTimelineScrubber(empires, empire.id, loadEmpire);
 
   writeUrlState({ empireId: empire.id, categoryKeys: activeKeys });
-  flyToEmpireBounds(view, empire);
+  const center = flyToEmpireBounds(view, empire);
+  view.atmosphere.setSolarTime({ lng: center.lng }, MORNING_SOLAR_HOUR);
 }
 
 // Picks which categories should be active on load: an explicit one-off
