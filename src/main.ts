@@ -4,14 +4,15 @@ import ThreeView, {
   type LatLng,
   type Layer,
   type MeshHandle,
-} from "@navara/three";
-import { DefaultDescriptions, DefaultPlugin } from "@navara/three_default_plugin";
+  type Source,
+} from "@navaramap/three";
+import { DefaultDescriptions, DefaultPlugin } from "@navaramap/three-default-plugin";
 import type {
   AmbientLightDesc,
   ArclineMeshDesc,
   InstancedGltfModelMeshDesc,
-} from "@navara/three_default_descs";
-import { AttributionPlugin } from "@navara/three_plugins";
+} from "@navaramap/three-default-descs";
+import { TileJsonPlugin } from "@navaramap/three-plugins";
 import { Vector3 } from "three";
 import { empires } from "./data/empires";
 import type { Empire } from "./data/types";
@@ -40,11 +41,13 @@ const view = new ThreeView<DefaultDescriptions>();
 
 // Plugins
 
-const attribution = new AttributionPlugin();
-view.addPlugin(attribution);
-
 const defaultPlugin = new DefaultPlugin();
 view.addPlugin(defaultPlugin);
+
+// For the Natural Earth basemap below: plugins must all be in before init,
+// even though its addSource can only run after.
+const tileJsonPlugin = new TileJsonPlugin();
+view.addPlugin(tileJsonPlugin);
 
 // Initialization
 
@@ -57,23 +60,18 @@ view.addLight<AmbientLightDesc>({
   ambient: { intensity: 20, color: new Color().setHex(0xffffff) },
 });
 
-view.atmosphere.date.setHours(8);
+// Pin the instant the sun is computed from, so lighting doesn't depend on the
+// device clock or timezone (a bare `setHours` would). An equinox keeps daylight
+// even across both hemispheres, which the empires span. loadEmpire() then
+// shifts within this solar day so the framed empire sits in morning light.
+view.atmosphere.date = new Date("2026-03-20T12:00:00Z");
+const MORNING_SOLAR_HOUR = 8;
+
 view.toneMappingExposure = 1.2;
 
 // Layer declarations
 
-const raster = view.addSource({
-  type: "raster-tile",
-  url: "https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
-  maxZoom: 20,
-});
-
-view.addLayer({
-  type: "raster",
-  source: raster,
-  raster: {},
-});
-
+// Render order is add order: terrain first, then everything draped on it.
 const terrain = view.addSource({
   type: "quantized-mesh",
   url: "https://terrain.reearth.land/cesium-mesh/ellipsoid/{z}/{x}/{y}.terrain",
@@ -86,6 +84,58 @@ view.addLayer({
   type: "terrain",
   source: terrain,
   terrain: {},
+});
+
+// The dark world basemap is drawn, not fetched: Natural Earth admin polygons
+// (Re:Earth Papers' key-free vector tiles) with `countries` filled near-black
+// over a globe coloured as the ocean, so land reads darker than water with
+// crisp coastlines and no place names competing with the city labels.
+//
+// A TileJSON document, not a `{z}/{x}/{y}` template: TileJsonPlugin fetches
+// it, derives the tile endpoint and zoom range (0-8), and surfaces the
+// tileset's attribution through view.attribution, so the basemap needs no
+// hand-written credit below.
+const NATURAL_EARTH_TILEJSON_URL = "https://papers.reearth.land/naturalearth_admin/tilejson.json";
+const BASEMAP_LAND_COLOR = 0x090909;
+const BASEMAP_BORDER_COLOR = 0x555555;
+const OCEAN_COLOR = 0x232425;
+
+// globe.color *is* the ocean: the basemap draws only land polygons, so every
+// sea on the planet renders as this. A mid grey pitched between two failure
+// modes - light enough that the near-black land still reads against it, dark
+// enough that the horizon doesn't glow.
+view.globe.color = new Color().setHex(OCEAN_COLOR);
+
+const basemapSource = await tileJsonPlugin.addSource({
+  type: "vector-tile",
+  url: NATURAL_EARTH_TILEJSON_URL,
+});
+
+view.addLayer({
+  type: "vector",
+  source: basemapSource,
+  // `countries` alone covers every landmass; the tileset's other polygon
+  // layers are the same land partitioned differently.
+  sourceLayers: ["countries"],
+  polygon: {
+    color: new Color().setHex(BASEMAP_LAND_COLOR),
+    // Lets a little globe colour through so the land never goes fully dead.
+    opacity: 0.85,
+    clampToGround: true,
+  },
+});
+
+// Without the borders each continent is one undifferentiated silhouette;
+// faint grey lines are enough to break it into countries.
+view.addLayer({
+  type: "vector",
+  source: basemapSource,
+  sourceLayers: ["boundary_lines"],
+  polyline: {
+    color: new Color().setHex(BASEMAP_BORDER_COLOR),
+    opacity: 0.5,
+    clampToGround: true,
+  },
 });
 
 // Trade route visualization
@@ -136,9 +186,10 @@ let currentActiveKeys: string[] = [];
 // Mutable scene state for whichever empire is currently displayed. Swapping
 // empires tears these down and rebuilds them from the new dataset.
 let arcMeshHandles = new Map<string, MeshHandle<ArclineMeshDesc>>();
+let citySource: Source | undefined;
 let cityPointsLayer: Layer | undefined;
 let cityLabelsLayer: Layer | undefined;
-let territoryLayer: Layer | undefined;
+let territory: { source: Source; layer: Layer } | undefined;
 
 let pendingActiveKeys: string[] | undefined;
 
@@ -179,12 +230,17 @@ function clearEmpireScene() {
     handle.delete();
   }
   arcMeshHandles = new Map();
+  // A source can't be deleted while a layer still references it, so the
+  // layers go first.
   cityPointsLayer?.delete();
   cityLabelsLayer?.delete();
-  territoryLayer?.delete();
+  citySource?.delete();
+  territory?.layer.delete();
+  territory?.source.delete();
   cityPointsLayer = undefined;
   cityLabelsLayer = undefined;
-  territoryLayer = undefined;
+  citySource = undefined;
+  territory = undefined;
 
   clearRouteMarkers();
 }
@@ -234,25 +290,33 @@ function loadEmpire(empire: Empire) {
   routeHoverTargets = buildRouteHoverTargets(empire);
   syncRouteMarkers();
 
-  // Two layers sharing the same GeoJSON data: one for the marker dot, one
-  // for the name label, so both render independently of each other.
-  const cityFeatureCollection = buildCityFeatureCollection(empire.cities);
-
-  cityPointsLayer = view.addLayer({
+  // Two layers sharing one GeoJSON source: one for the marker dot, one for
+  // the name label, so both render independently of each other.
+  citySource = view.addSource({
     type: "geojson",
-    data: cityFeatureCollection,
+    data: buildCityFeatureCollection(empire.cities),
+  });
+
+  // Screen-space decluttering is on by default and runs across layers, so a
+  // dot and the label anchored at the same city would suppress each other
+  // (most labels silently vanished). Every city is meant to be labelled, so
+  // both layers opt out.
+  cityPointsLayer = view.addLayer({
+    type: "vector",
+    source: citySource,
     point: {
       color: new Color().setHex(0xffe066),
       size: 8,
       sizeInMeters: false,
       clampToGround: true,
       offsetDepth: true,
+      declutter: false,
     },
   });
 
   cityLabelsLayer = view.addLayer({
-    type: "geojson",
-    data: cityFeatureCollection,
+    type: "vector",
+    source: citySource,
     text: {
       font: "TradeRouteLabels",
       size: 16,
@@ -264,6 +328,7 @@ function loadEmpire(empire: Empire) {
       center: { x: 0.65, y: 0 },
       clampToGround: true,
       offsetDepth: true,
+      declutter: false,
     },
   });
 
@@ -273,18 +338,23 @@ function loadEmpire(empire: Empire) {
     }));
   });
 
-  territoryLayer = empire.territory
-    ? view.addLayer({
-        type: "geojson",
-        data: buildTerritoryFeatureCollection(empire.territory),
-        polyline: {
-          color: new Color().setHex(TERRITORY_COLOR),
-          width: 2,
-          clampToGround: true,
-          show: territoryVisible,
-        },
-      })
-    : undefined;
+  if (empire.territory) {
+    const source = view.addSource({
+      type: "geojson",
+      data: buildTerritoryFeatureCollection(empire.territory),
+    });
+    const layer = view.addLayer({
+      type: "vector",
+      source,
+      polyline: {
+        color: new Color().setHex(TERRITORY_COLOR),
+        width: 2,
+        clampToGround: true,
+        show: territoryVisible,
+      },
+    });
+    territory = { source, layer };
+  }
 
   createLegend(empire, arcMeshHandles, empires, jumpToEmpireWithTrace, {
     initialActiveKeys: activeKeys,
@@ -300,22 +370,19 @@ function loadEmpire(empire: Empire) {
     initialTerritoryVisible: territoryVisible,
     onTerritoryVisibilityChange: (visible) => {
       territoryVisible = visible;
-      territoryLayer?.update({
-        type: "geojson",
-        data: buildTerritoryFeatureCollection(empire.territory),
-        polyline: {
-          color: new Color().setHex(TERRITORY_COLOR),
-          width: 2,
-          clampToGround: true,
-          show: visible,
-        },
+      // Layer.update() merges: the rest of the polyline material is preserved.
+      territory?.layer.update({
+        type: "vector",
+        source: territory.source,
+        polyline: { show: visible },
       });
     },
   });
   createTimelineScrubber(empires, empire.id, loadEmpire);
 
   writeUrlState({ empireId: empire.id, categoryKeys: activeKeys });
-  flyToEmpireBounds(view, empire);
+  const center = flyToEmpireBounds(view, empire);
+  view.atmosphere.setSolarTime({ lng: center.lng }, MORNING_SOLAR_HOUR);
 }
 
 // Picks which categories should be active on load: an explicit one-off
@@ -361,7 +428,7 @@ view.animation = true;
 const HOVER_PIXEL_RADIUS = 14; // CSS pixels
 const hoverScratch = new Vector3();
 
-view.on("mousemove", (event) => {
+view.on("pointermove", (event) => {
   const canvas = event.target as HTMLElement | null;
   if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
@@ -392,8 +459,8 @@ view.on("mousemove", (event) => {
 
 // Clicking a city marker or label opens a card listing every trade route
 // through it; clicking anything else (an empty patch of globe, an arc)
-// closes it, since `pick` fires with `null` when nothing was hit.
-view.on("pick", (info) => {
+// closes it, since `featureClick` fires with `null` when nothing was hit.
+view.on("featureClick", (info) => {
   if (!info || !currentEmpire) {
     closeCityCard();
     return;
@@ -431,11 +498,10 @@ loadEmpire(initialEmpire);
 
 // Attribution
 
-attribution.show([
-  {
-    attributionHtml: `Basemap by <a href="https://carto.com/attributions">CARTO</a>, data by <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>`,
-    attributionUrl: "https://carto.com/attributions",
-  },
+// The basemap's own credit (Re:Earth Papers) arrives via TileJsonPlugin, which
+// reads it out of the TileJSON document; only our own data goes here.
+view.attribution?.add([
+  { attribution: "© Re:Earth Terrain", attributionUrl: "https://terrain.reearth.land/" },
   {
     attributionHtml: `Territory outlines from <a href="https://github.com/aourednik/historical-basemaps">historical-basemaps</a> (GPL-3.0)`,
     attributionUrl: "https://github.com/aourednik/historical-basemaps",

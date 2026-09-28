@@ -30,28 +30,40 @@ Pushes to `main` deploy automatically to GitHub Pages via
 
 ## Navara dependency
 
-`@navara/*` packages are vendored as tarballs in `externals/*.tgz` and wired
-into `package.json` `dependencies`/`overrides` and `pnpm-workspace.yaml`
-`overrides` by exact file path — not published to a registry. If a Navara
-package needs updating, replace the tarball in `externals/` and keep all
-three of those references (package.json dependencies, package.json
-overrides/resolutions, pnpm-workspace.yaml overrides) pointing at consistent
-versions, or pnpm will resolve mismatched copies.
+`@navaramap/*` packages (`three`, `three-default-plugin`,
+`three-default-descs`, `three-plugins`) are installed from npm and pinned to
+one exact version in `package.json` `dependencies`. The companion packages
+declare `@navaramap/three` as an exact-version peer dependency, so when
+upgrading, bump all four to the same version in one go or pnpm will report
+unmet peers. Coordinates in the public API (`LatLng`, `LatLngHeight`,
+`EllipsoidGeodesic`, `geodeticToVector3`) are in **degrees**.
 
-`vite.config.ts` has a `closeBundle` plugin step that copies
-`@navara/three`'s runtime asset directories (`atmosphere`, `cloud`, `noise`,
-`water`) into `dist/assets/assets/*` after build. Navara resolves these at
-runtime via a `new URL(...)` call Vite can't statically analyze, so without
-this copy step the production build's atmosphere/cloud/water effects break
-silently. Don't remove it when touching the Vite config.
+`.claude/skills/navara-usage/` is a verbatim copy of the Navara repository's
+`skills/navara-usage` at the `v0.1.1` tag, i.e. the version pinned here. When
+bumping the Navara packages, re-copy it from the matching tag so the guidance
+tracks the installed API.
+
+`vite.config.ts` has a `closeBundle` plugin step that copies the prebuilt
+worker `.wasm` files from `@navaramap/three`'s `dist/assets` into
+`dist/assets/`: Vite re-emits the worker chunks (e.g. the font worker) as
+opaque assets and never sees the `.wasm` they fetch relative to their own URL,
+so without it text labels silently fail to render. The atmosphere/cloud/noise/
+water textures need no such step — each is referenced via a static
+`new URL(..., import.meta.url)` and bundles automatically. Don't remove the
+copy step when touching the Vite config.
 
 ## Architecture
 
 Everything lives under `src/`, driven by one imperative entry point,
 `main.ts`, which:
 
-1. Boots a Navara `ThreeView`, adds the `DefaultPlugin` scene (basemap,
-   terrain, ambient light) and `AttributionPlugin`.
+1. Boots a Navara `ThreeView` (its built-in attribution UI is left on), adds
+   the `DefaultPlugin` photoreal scene and ambient light, a quantized-mesh
+   terrain source, and a dark world basemap drawn from Natural Earth admin
+   vector tiles: `TileJsonPlugin` (registered before `init()`, `addSource`
+   called after) resolves the tileset from its TileJSON and pushes its credit
+   into `view.attribution`; `countries` polygons are filled near-black over a
+   globe coloured as the ocean, with `boundary_lines` as faint borders.
 2. Loads the ship/camel `.glb` models once as `InstancedGltfModelMeshDesc`
    meshes (`shipMeshHandle` / `camelMeshHandle`) shared across all empires —
    individual trade-route markers are *instances* added/removed from these,
@@ -60,7 +72,11 @@ Everything lives under `src/`, driven by one imperative entry point,
    scene for one empire: one `ArclineMeshDesc` mesh per trade category (so
    the legend can show/hide a whole good's routes via one handle), one route
    marker instance per trade route positioned along an `EllipsoidGeodesic`,
-   city point/label GeoJSON layers, and an optional territory outline layer.
+   a GeoJSON source of cities rendered by point and label `vector` layers,
+   and an optional territory outline source + layer. It then flies the
+   camera to frame the empire's cities and re-aims the sun to 08:00 local
+   solar time over that center (`atmosphere.setSolarTime`, from a base
+   instant pinned in UTC so lighting never depends on the device clock).
 4. Drives a `preRender` loop that animates the dash pattern flowing along
    each arc and slides every ship/camel instance along its geodesic in step
    with it (matched speed constants: `DASH_FLOW_SPEED` / `MARKER_SPEED`).
