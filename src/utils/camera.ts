@@ -1,5 +1,5 @@
-import type ThreeView from "@navara/three";
-import type { DefaultDescriptions } from "@navara/three_default_plugin";
+import type ThreeView from "@navaramap/three";
+import type { DefaultDescriptions } from "@navaramap/three-default-plugin";
 import type { Empire } from "../data/types";
 
 type View = ThreeView<DefaultDescriptions>;
@@ -34,5 +34,5 @@ export function flyToEmpireBounds(view: View, empire: Empire): void {
   const height = Math.min(9_000_000, Math.max(3_500_000, spanDeg * 130_000));
 
   stopCameraFlight(view);
-  view.flyTo({ lng: centerLng, lat: centerLat, height, pitch: -90, heading: 0 }, 3000);
+  view.flyTo({ lng: centerLng, lat: centerLat, height, pitch: -90, heading: 0 }, { duration: 3000 });
 }

@@ -98,7 +98,7 @@ legend, and camera framing - is generated from that data automatically.
 
 ## Tech
 
-- [Navara](https://navara-docs.netlify.app/) (`@navara/three`) for the 3D
+- [Navara](https://navara-docs.netlify.app/) (`@navaramap/three`) for the 3D
   globe, dark basemap tiles and terrain from
   [CARTO](https://carto.com/attributions) / [OpenStreetMap](https://www.openstreetmap.org/copyright),
   and the Cinzel / Inter type pairing from Google Fonts.

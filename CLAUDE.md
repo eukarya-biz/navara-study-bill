@@ -30,28 +30,32 @@ Pushes to `main` deploy automatically to GitHub Pages via
 
 ## Navara dependency
 
-`@navara/*` packages are vendored as tarballs in `externals/*.tgz` and wired
-into `package.json` `dependencies`/`overrides` and `pnpm-workspace.yaml`
-`overrides` by exact file path — not published to a registry. If a Navara
-package needs updating, replace the tarball in `externals/` and keep all
-three of those references (package.json dependencies, package.json
-overrides/resolutions, pnpm-workspace.yaml overrides) pointing at consistent
-versions, or pnpm will resolve mismatched copies.
+`@navaramap/*` packages (`three`, `three-default-plugin`,
+`three-default-descs`) are installed from npm and pinned to one exact
+version in `package.json` `dependencies`. The two companion packages declare
+`@navaramap/three` as an exact-version peer dependency, so when upgrading,
+bump all three to the same version in one go or pnpm will report unmet
+peers. Coordinates in the public API (`LatLng`, `LatLngHeight`,
+`EllipsoidGeodesic`, `geodeticToVector3`) are in **degrees**.
 
 `vite.config.ts` has a `closeBundle` plugin step that copies
-`@navara/three`'s runtime asset directories (`atmosphere`, `cloud`, `noise`,
+`@navaramap/three`'s runtime asset directories (`atmosphere`, `cloud`, `noise`,
 `water`) into `dist/assets/assets/*` after build. Navara resolves these at
 runtime via a `new URL(...)` call Vite can't statically analyze, so without
 this copy step the production build's atmosphere/cloud/water effects break
-silently. Don't remove it when touching the Vite config.
+silently. The same step also copies the prebuilt worker `.wasm` files from
+that directory into `dist/assets/`: Vite re-emits the worker chunks (e.g. the
+font worker) as opaque assets and never sees the `.wasm` they fetch relative
+to their own URL, so without it text labels silently fail to render. Don't
+remove it when touching the Vite config.
 
 ## Architecture
 
 Everything lives under `src/`, driven by one imperative entry point,
 `main.ts`, which:
 
-1. Boots a Navara `ThreeView`, adds the `DefaultPlugin` scene (basemap,
-   terrain, ambient light) and `AttributionPlugin`.
+1. Boots a Navara `ThreeView` (its built-in attribution UI is left on) and
+   adds the `DefaultPlugin` scene (basemap, terrain, ambient light).
 2. Loads the ship/camel `.glb` models once as `InstancedGltfModelMeshDesc`
    meshes (`shipMeshHandle` / `camelMeshHandle`) shared across all empires —
    individual trade-route markers are *instances* added/removed from these,
@@ -60,7 +64,8 @@ Everything lives under `src/`, driven by one imperative entry point,
    scene for one empire: one `ArclineMeshDesc` mesh per trade category (so
    the legend can show/hide a whole good's routes via one handle), one route
    marker instance per trade route positioned along an `EllipsoidGeodesic`,
-   city point/label GeoJSON layers, and an optional territory outline layer.
+   a GeoJSON source of cities rendered by point and label `vector` layers,
+   and an optional territory outline source + layer.
 4. Drives a `preRender` loop that animates the dash pattern flowing along
    each arc and slides every ship/camel instance along its geodesic in step
    with it (matched speed constants: `DASH_FLOW_SPEED` / `MARKER_SPEED`).

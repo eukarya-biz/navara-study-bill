@@ -4,14 +4,15 @@ import ThreeView, {
   type LatLng,
   type Layer,
   type MeshHandle,
-} from "@navara/three";
-import { DefaultDescriptions, DefaultPlugin } from "@navara/three_default_plugin";
+  type Source,
+  type VectorLayer,
+} from "@navaramap/three";
+import { DefaultDescriptions, DefaultPlugin } from "@navaramap/three-default-plugin";
 import type {
   AmbientLightDesc,
   ArclineMeshDesc,
   InstancedGltfModelMeshDesc,
-} from "@navara/three_default_descs";
-import { AttributionPlugin } from "@navara/three_plugins";
+} from "@navaramap/three-default-descs";
 import { Vector3 } from "three";
 import { empires } from "./data/empires";
 import type { Empire } from "./data/types";
@@ -39,9 +40,6 @@ const view = new ThreeView<DefaultDescriptions>();
 (window as any).__view = view;
 
 // Plugins
-
-const attribution = new AttributionPlugin();
-view.addPlugin(attribution);
 
 const defaultPlugin = new DefaultPlugin();
 view.addPlugin(defaultPlugin);
@@ -136,9 +134,10 @@ let currentActiveKeys: string[] = [];
 // Mutable scene state for whichever empire is currently displayed. Swapping
 // empires tears these down and rebuilds them from the new dataset.
 let arcMeshHandles = new Map<string, MeshHandle<ArclineMeshDesc>>();
+let citySource: Source | undefined;
 let cityPointsLayer: Layer | undefined;
 let cityLabelsLayer: Layer | undefined;
-let territoryLayer: Layer | undefined;
+let territory: { source: Source; layer: Layer } | undefined;
 
 let pendingActiveKeys: string[] | undefined;
 
@@ -149,6 +148,19 @@ let currentTraceKey: string | undefined;
 let territoryVisible = true;
 
 const TERRITORY_COLOR = 0xd4af6e;
+
+function territoryLayerDescription(source: Source, show: boolean): VectorLayer {
+  return {
+    type: "vector",
+    source,
+    polyline: {
+      color: new Color().setHex(TERRITORY_COLOR),
+      width: 2,
+      clampToGround: true,
+      show,
+    },
+  };
+}
 
 function clearRouteMarkers() {
   disposeRouteMarkers(routeMarkers, { ship: shipMeshHandle.ref, camel: camelMeshHandle.ref });
@@ -179,12 +191,17 @@ function clearEmpireScene() {
     handle.delete();
   }
   arcMeshHandles = new Map();
+  // A source can't be deleted while a layer still references it, so the
+  // layers go first.
   cityPointsLayer?.delete();
   cityLabelsLayer?.delete();
-  territoryLayer?.delete();
+  citySource?.delete();
+  territory?.layer.delete();
+  territory?.source.delete();
   cityPointsLayer = undefined;
   cityLabelsLayer = undefined;
-  territoryLayer = undefined;
+  citySource = undefined;
+  territory = undefined;
 
   clearRouteMarkers();
 }
@@ -234,25 +251,33 @@ function loadEmpire(empire: Empire) {
   routeHoverTargets = buildRouteHoverTargets(empire);
   syncRouteMarkers();
 
-  // Two layers sharing the same GeoJSON data: one for the marker dot, one
-  // for the name label, so both render independently of each other.
-  const cityFeatureCollection = buildCityFeatureCollection(empire.cities);
-
-  cityPointsLayer = view.addLayer({
+  // Two layers sharing one GeoJSON source: one for the marker dot, one for
+  // the name label, so both render independently of each other.
+  citySource = view.addSource({
     type: "geojson",
-    data: cityFeatureCollection,
+    data: buildCityFeatureCollection(empire.cities),
+  });
+
+  // Screen-space decluttering is on by default and runs across layers, so a
+  // dot and the label anchored at the same city would suppress each other
+  // (most labels silently vanished). Every city is meant to be labelled, so
+  // both layers opt out.
+  cityPointsLayer = view.addLayer({
+    type: "vector",
+    source: citySource,
     point: {
       color: new Color().setHex(0xffe066),
       size: 8,
       sizeInMeters: false,
       clampToGround: true,
       offsetDepth: true,
+      declutter: false,
     },
   });
 
   cityLabelsLayer = view.addLayer({
-    type: "geojson",
-    data: cityFeatureCollection,
+    type: "vector",
+    source: citySource,
     text: {
       font: "TradeRouteLabels",
       size: 16,
@@ -264,6 +289,7 @@ function loadEmpire(empire: Empire) {
       center: { x: 0.65, y: 0 },
       clampToGround: true,
       offsetDepth: true,
+      declutter: false,
     },
   });
 
@@ -273,18 +299,13 @@ function loadEmpire(empire: Empire) {
     }));
   });
 
-  territoryLayer = empire.territory
-    ? view.addLayer({
-        type: "geojson",
-        data: buildTerritoryFeatureCollection(empire.territory),
-        polyline: {
-          color: new Color().setHex(TERRITORY_COLOR),
-          width: 2,
-          clampToGround: true,
-          show: territoryVisible,
-        },
-      })
-    : undefined;
+  if (empire.territory) {
+    const source = view.addSource({
+      type: "geojson",
+      data: buildTerritoryFeatureCollection(empire.territory),
+    });
+    territory = { source, layer: view.addLayer(territoryLayerDescription(source, territoryVisible)) };
+  }
 
   createLegend(empire, arcMeshHandles, empires, jumpToEmpireWithTrace, {
     initialActiveKeys: activeKeys,
@@ -300,16 +321,7 @@ function loadEmpire(empire: Empire) {
     initialTerritoryVisible: territoryVisible,
     onTerritoryVisibilityChange: (visible) => {
       territoryVisible = visible;
-      territoryLayer?.update({
-        type: "geojson",
-        data: buildTerritoryFeatureCollection(empire.territory),
-        polyline: {
-          color: new Color().setHex(TERRITORY_COLOR),
-          width: 2,
-          clampToGround: true,
-          show: visible,
-        },
-      });
+      territory?.layer.update(territoryLayerDescription(territory.source, visible));
     },
   });
   createTimelineScrubber(empires, empire.id, loadEmpire);
@@ -361,7 +373,7 @@ view.animation = true;
 const HOVER_PIXEL_RADIUS = 14; // CSS pixels
 const hoverScratch = new Vector3();
 
-view.on("mousemove", (event) => {
+view.on("pointermove", (event) => {
   const canvas = event.target as HTMLElement | null;
   if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
@@ -392,8 +404,8 @@ view.on("mousemove", (event) => {
 
 // Clicking a city marker or label opens a card listing every trade route
 // through it; clicking anything else (an empty patch of globe, an arc)
-// closes it, since `pick` fires with `null` when nothing was hit.
-view.on("pick", (info) => {
+// closes it, since `featureClick` fires with `null` when nothing was hit.
+view.on("featureClick", (info) => {
   if (!info || !currentEmpire) {
     closeCityCard();
     return;
@@ -431,7 +443,7 @@ loadEmpire(initialEmpire);
 
 // Attribution
 
-attribution.show([
+view.attribution?.add([
   {
     attributionHtml: `Basemap by <a href="https://carto.com/attributions">CARTO</a>, data by <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>`,
     attributionUrl: "https://carto.com/attributions",
