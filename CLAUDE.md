@@ -31,11 +31,11 @@ Pushes to `main` deploy automatically to GitHub Pages via
 ## Navara dependency
 
 `@navaramap/*` packages (`three`, `three-default-plugin`,
-`three-default-descs`) are installed from npm and pinned to one exact
-version in `package.json` `dependencies`. The two companion packages declare
-`@navaramap/three` as an exact-version peer dependency, so when upgrading,
-bump all three to the same version in one go or pnpm will report unmet
-peers. Coordinates in the public API (`LatLng`, `LatLngHeight`,
+`three-default-descs`, `three-plugins`) are installed from npm and pinned to
+one exact version in `package.json` `dependencies`. The companion packages
+declare `@navaramap/three` as an exact-version peer dependency, so when
+upgrading, bump all four to the same version in one go or pnpm will report
+unmet peers. Coordinates in the public API (`LatLng`, `LatLngHeight`,
 `EllipsoidGeodesic`, `geodeticToVector3`) are in **degrees**.
 
 `vite.config.ts` has a `closeBundle` plugin step that copies
@@ -54,8 +54,13 @@ remove it when touching the Vite config.
 Everything lives under `src/`, driven by one imperative entry point,
 `main.ts`, which:
 
-1. Boots a Navara `ThreeView` (its built-in attribution UI is left on) and
-   adds the `DefaultPlugin` scene (basemap, terrain, ambient light).
+1. Boots a Navara `ThreeView` (its built-in attribution UI is left on), adds
+   the `DefaultPlugin` photoreal scene and ambient light, a quantized-mesh
+   terrain source, and a dark world basemap drawn from Natural Earth admin
+   vector tiles: `TileJsonPlugin` (registered before `init()`, `addSource`
+   called after) resolves the tileset from its TileJSON and pushes its credit
+   into `view.attribution`; `countries` polygons are filled near-black over a
+   globe coloured as the ocean, with `boundary_lines` as faint borders.
 2. Loads the ship/camel `.glb` models once as `InstancedGltfModelMeshDesc`
    meshes (`shipMeshHandle` / `camelMeshHandle`) shared across all empires —
    individual trade-route markers are *instances* added/removed from these,

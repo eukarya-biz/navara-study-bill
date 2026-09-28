@@ -99,9 +99,9 @@ legend, and camera framing - is generated from that data automatically.
 ## Tech
 
 - [Navara](https://navara-docs.netlify.app/) (`@navaramap/three`) for the 3D
-  globe, dark basemap tiles and terrain from
-  [CARTO](https://carto.com/attributions) / [OpenStreetMap](https://www.openstreetmap.org/copyright),
-  and the Cinzel / Inter type pairing from Google Fonts.
+  globe, a dark basemap drawn from Natural Earth admin vector tiles served by
+  [Re:Earth Papers](https://papers.reearth.land/attribution), Re:Earth
+  terrain tiles, and the Cinzel / Inter type pairing from Google Fonts.
 - Empire territory outlines are real historical boundaries from
   [historical-basemaps](https://github.com/aourednik/historical-basemaps)
   (`world_100`/`world_800`/`world_1279`/`world_1800`/`world_1920.geojson`),

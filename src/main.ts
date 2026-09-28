@@ -13,6 +13,7 @@ import type {
   ArclineMeshDesc,
   InstancedGltfModelMeshDesc,
 } from "@navaramap/three-default-descs";
+import { TileJsonPlugin } from "@navaramap/three-plugins";
 import { Vector3 } from "three";
 import { empires } from "./data/empires";
 import type { Empire } from "./data/types";
@@ -44,6 +45,11 @@ const view = new ThreeView<DefaultDescriptions>();
 const defaultPlugin = new DefaultPlugin();
 view.addPlugin(defaultPlugin);
 
+// For the Natural Earth basemap below: plugins must all be in before init,
+// even though its addSource can only run after.
+const tileJsonPlugin = new TileJsonPlugin();
+view.addPlugin(tileJsonPlugin);
+
 // Initialization
 
 await view.init();
@@ -60,18 +66,7 @@ view.toneMappingExposure = 1.2;
 
 // Layer declarations
 
-const raster = view.addSource({
-  type: "raster-tile",
-  url: "https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
-  maxZoom: 20,
-});
-
-view.addLayer({
-  type: "raster",
-  source: raster,
-  raster: {},
-});
-
+// Render order is add order: terrain first, then everything draped on it.
 const terrain = view.addSource({
   type: "quantized-mesh",
   url: "https://terrain.reearth.land/cesium-mesh/ellipsoid/{z}/{x}/{y}.terrain",
@@ -84,6 +79,58 @@ view.addLayer({
   type: "terrain",
   source: terrain,
   terrain: {},
+});
+
+// The dark world basemap is drawn, not fetched: Natural Earth admin polygons
+// (Re:Earth Papers' key-free vector tiles) with `countries` filled near-black
+// over a globe coloured as the ocean, so land reads darker than water with
+// crisp coastlines and no place names competing with the city labels.
+//
+// A TileJSON document, not a `{z}/{x}/{y}` template: TileJsonPlugin fetches
+// it, derives the tile endpoint and zoom range (0-8), and surfaces the
+// tileset's attribution through view.attribution, so the basemap needs no
+// hand-written credit below.
+const NATURAL_EARTH_TILEJSON_URL = "https://papers.reearth.land/naturalearth_admin/tilejson.json";
+const BASEMAP_LAND_COLOR = 0x090909;
+const BASEMAP_BORDER_COLOR = 0x555555;
+const OCEAN_COLOR = 0x232425;
+
+// globe.color *is* the ocean: the basemap draws only land polygons, so every
+// sea on the planet renders as this. A mid grey pitched between two failure
+// modes - light enough that the near-black land still reads against it, dark
+// enough that the horizon doesn't glow.
+view.globe.color = new Color().setHex(OCEAN_COLOR);
+
+const basemapSource = await tileJsonPlugin.addSource({
+  type: "vector-tile",
+  url: NATURAL_EARTH_TILEJSON_URL,
+});
+
+view.addLayer({
+  type: "vector",
+  source: basemapSource,
+  // `countries` alone covers every landmass; the tileset's other polygon
+  // layers are the same land partitioned differently.
+  sourceLayers: ["countries"],
+  polygon: {
+    color: new Color().setHex(BASEMAP_LAND_COLOR),
+    // Lets a little globe colour through so the land never goes fully dead.
+    opacity: 0.85,
+    clampToGround: true,
+  },
+});
+
+// Without the borders each continent is one undifferentiated silhouette;
+// faint grey lines are enough to break it into countries.
+view.addLayer({
+  type: "vector",
+  source: basemapSource,
+  sourceLayers: ["boundary_lines"],
+  polyline: {
+    color: new Color().setHex(BASEMAP_BORDER_COLOR),
+    opacity: 0.5,
+    clampToGround: true,
+  },
 });
 
 // Trade route visualization
@@ -443,11 +490,9 @@ loadEmpire(initialEmpire);
 
 // Attribution
 
+// The basemap's own credit (Re:Earth Papers) arrives via TileJsonPlugin, which
+// reads it out of the TileJSON document; only our own data goes here.
 view.attribution?.add([
-  {
-    attributionHtml: `Basemap by <a href="https://carto.com/attributions">CARTO</a>, data by <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>`,
-    attributionUrl: "https://carto.com/attributions",
-  },
   {
     attributionHtml: `Territory outlines from <a href="https://github.com/aourednik/historical-basemaps">historical-basemaps</a> (GPL-3.0)`,
     attributionUrl: "https://github.com/aourednik/historical-basemaps",
