@@ -43,16 +43,14 @@ unmet peers. Coordinates in the public API (`LatLng`, `LatLngHeight`,
 bumping the Navara packages, re-copy it from the matching tag so the guidance
 tracks the installed API.
 
-`vite.config.ts` has a `closeBundle` plugin step that copies
-`@navaramap/three`'s runtime asset directories (`atmosphere`, `cloud`, `noise`,
-`water`) into `dist/assets/assets/*` after build. Navara resolves these at
-runtime via a `new URL(...)` call Vite can't statically analyze, so without
-this copy step the production build's atmosphere/cloud/water effects break
-silently. The same step also copies the prebuilt worker `.wasm` files from
-that directory into `dist/assets/`: Vite re-emits the worker chunks (e.g. the
-font worker) as opaque assets and never sees the `.wasm` they fetch relative
-to their own URL, so without it text labels silently fail to render. Don't
-remove it when touching the Vite config.
+`vite.config.ts` has a `closeBundle` plugin step that copies the prebuilt
+worker `.wasm` files from `@navaramap/three`'s `dist/assets` into
+`dist/assets/`: Vite re-emits the worker chunks (e.g. the font worker) as
+opaque assets and never sees the `.wasm` they fetch relative to their own URL,
+so without it text labels silently fail to render. The atmosphere/cloud/noise/
+water textures need no such step — each is referenced via a static
+`new URL(..., import.meta.url)` and bundles automatically. Don't remove the
+copy step when touching the Vite config.
 
 ## Architecture
 

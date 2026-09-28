@@ -5,7 +5,6 @@ import ThreeView, {
   type Layer,
   type MeshHandle,
   type Source,
-  type VectorLayer,
 } from "@navaramap/three";
 import { DefaultDescriptions, DefaultPlugin } from "@navaramap/three-default-plugin";
 import type {
@@ -202,19 +201,6 @@ let territoryVisible = true;
 
 const TERRITORY_COLOR = 0xd4af6e;
 
-function territoryLayerDescription(source: Source, show: boolean): VectorLayer {
-  return {
-    type: "vector",
-    source,
-    polyline: {
-      color: new Color().setHex(TERRITORY_COLOR),
-      width: 2,
-      clampToGround: true,
-      show,
-    },
-  };
-}
-
 function clearRouteMarkers() {
   disposeRouteMarkers(routeMarkers, { ship: shipMeshHandle.ref, camel: camelMeshHandle.ref });
   routeMarkers = [];
@@ -357,7 +343,17 @@ function loadEmpire(empire: Empire) {
       type: "geojson",
       data: buildTerritoryFeatureCollection(empire.territory),
     });
-    territory = { source, layer: view.addLayer(territoryLayerDescription(source, territoryVisible)) };
+    const layer = view.addLayer({
+      type: "vector",
+      source,
+      polyline: {
+        color: new Color().setHex(TERRITORY_COLOR),
+        width: 2,
+        clampToGround: true,
+        show: territoryVisible,
+      },
+    });
+    territory = { source, layer };
   }
 
   createLegend(empire, arcMeshHandles, empires, jumpToEmpireWithTrace, {
@@ -374,7 +370,12 @@ function loadEmpire(empire: Empire) {
     initialTerritoryVisible: territoryVisible,
     onTerritoryVisibilityChange: (visible) => {
       territoryVisible = visible;
-      territory?.layer.update(territoryLayerDescription(territory.source, visible));
+      // Layer.update() merges: the rest of the polyline material is preserved.
+      territory?.layer.update({
+        type: "vector",
+        source: territory.source,
+        polyline: { show: visible },
+      });
     },
   });
   createTimelineScrubber(empires, empire.id, loadEmpire);
