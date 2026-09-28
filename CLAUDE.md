@@ -38,6 +38,11 @@ upgrading, bump all four to the same version in one go or pnpm will report
 unmet peers. Coordinates in the public API (`LatLng`, `LatLngHeight`,
 `EllipsoidGeodesic`, `geodeticToVector3`) are in **degrees**.
 
+`.claude/skills/navara-usage/` is a verbatim copy of the Navara repository's
+`skills/navara-usage` at the `v0.1.1` tag, i.e. the version pinned here. When
+bumping the Navara packages, re-copy it from the matching tag so the guidance
+tracks the installed API.
+
 `vite.config.ts` has a `closeBundle` plugin step that copies
 `@navaramap/three`'s runtime asset directories (`atmosphere`, `cloud`, `noise`,
 `water`) into `dist/assets/assets/*` after build. Navara resolves these at
