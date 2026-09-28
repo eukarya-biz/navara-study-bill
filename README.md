@@ -12,7 +12,7 @@ name labels, a toggleable legend per trade good, and a timeline scrubber to
 move between empires. Click a city to see the routes running through it, or
 trace a single good to find which other empires also traded it.
 
-Built on [Navara](https://navara-docs.netlify.app/), Re:Earth's WebGL globe
+Built on [Navara](https://navara.world/docs/), Re:Earth's WebGL globe
 engine.
 
 ## Empires
@@ -32,7 +32,7 @@ engine.
   an era label, and the camera flies to frame that empire's cities while
   the map rebuilds its routes.
 - **Legend** (top-right) has an **Empire territory** toggle above the goods
-  list, which shows or hides a dashed outline of the empire's extent at its
+  list, which shows or hides an outline of the empire's extent at its
   peak, and then lists each trade good with a color swatch; untick one to
   hide that category's routes. Tap the header to collapse/expand it
   (collapsed by default on small screens). The **trace** button on a row
@@ -65,12 +65,22 @@ Pushes to `main` deploy automatically to GitHub Pages (see
 
 ```
 src/
-  main.ts              # scene setup: basemap, terrain, arc-line meshes,
+  main.ts               # scene setup: basemap, terrain, arc-line meshes,
                         # ship/camel markers, city layers, camera framing,
                         # and wiring for the UI below
-  legend.ts             # floating legend panel (per-category toggle)
-  empireSwitcher.ts      # bottom tab bar for switching the active empire
+  legend.ts             # floating legend panel (per-category toggle, trace)
+  timelineScrubber.ts   # bottom timeline for switching the active empire
+  cityCard.ts           # card listing the routes through a clicked city
+  routeTooltip.ts       # tooltip shown while hovering a route arc
+  urlState.ts           # empire / active goods <-> URL query string
   style.css             # UI styling (dark, mobile-friendly)
+  utils/
+    camera.ts           # flies the camera to frame an empire
+    geo.ts              # lat/lng helpers (bearing, city lookups)
+    geojson.ts          # builds the city and territory GeoJSON
+    routeHover.ts       # screen-space hit-testing of route arcs
+    routeMarkers.ts     # ship/camel instances animated along each route
+    cityRoutes.ts       # routes through a given city (for the card)
   assets/
     models/             # ship.glb / camel.glb (see Tech for license/credit)
   data/
@@ -80,7 +90,7 @@ src/
     mongolEmpire.ts
     qingDynasty.ts
     britishEmpire.ts
-    empires.ts           # registry consumed by main.ts and the switcher
+    empires.ts          # registry consumed by main.ts and the scrubber
 ```
 
 ### Adding another empire
@@ -98,7 +108,7 @@ legend, and camera framing - is generated from that data automatically.
 
 ## Tech
 
-- [Navara](https://navara-docs.netlify.app/) (`@navaramap/three`) for the 3D
+- [Navara](https://navara.world/docs/) (`@navaramap/three`) for the 3D
   globe, a dark basemap drawn from Natural Earth admin vector tiles served by
   [Re:Earth Papers](https://papers.reearth.land/attribution), Re:Earth
   terrain tiles, and the Cinzel / Inter type pairing from Google Fonts.

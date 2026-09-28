@@ -501,6 +501,7 @@ loadEmpire(initialEmpire);
 // The basemap's own credit (Re:Earth Papers) arrives via TileJsonPlugin, which
 // reads it out of the TileJSON document; only our own data goes here.
 view.attribution?.add([
+  { attribution: "© Re:Earth Terrain", attributionUrl: "https://terrain.reearth.land/" },
   {
     attributionHtml: `Territory outlines from <a href="https://github.com/aourednik/historical-basemaps">historical-basemaps</a> (GPL-3.0)`,
     attributionUrl: "https://github.com/aourednik/historical-basemaps",
