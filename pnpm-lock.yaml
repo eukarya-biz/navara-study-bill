@@ -10,25 +10,22 @@ importers:
     dependencies:
       '@navaramap/three':
         specifier: 0.1.1
-        version: 0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+        version: 0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       '@navaramap/three-default-descs':
         specifier: 0.1.1
-        version: 0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+        version: 0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       '@navaramap/three-default-plugin':
         specifier: 0.1.1
-        version: 0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+        version: 0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       '@navaramap/three-plugins':
         specifier: 0.1.1
-        version: 0.1.1(@navaramap/three-default-plugin@0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(three@0.184.0)
+        version: 0.1.1(@navaramap/three-default-plugin@0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(three@0.184.0)
       postprocessing:
-        specifier: 6.38.3
-        version: 6.38.3(three@0.184.0)
+        specifier: 6.39.5
+        version: 6.39.5(three@0.184.0)
       three:
         specifier: 0.184.0
         version: 0.184.0
-      three-stdlib:
-        specifier: 2.36.1
-        version: 2.36.1(three@0.184.0)
     devDependencies:
       '@types/three':
         specifier: 0.184.0
@@ -666,10 +663,10 @@ packages:
     resolution: {integrity: sha512-pMMHxBOZKFU6HgAZ4eyGnwXF/EvPGGqUr0MnZ5+99485wwW41kW91A4LOGxSHhgugZmSChL5AlElNdwlNgcnLQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postprocessing@6.38.3:
-    resolution: {integrity: sha512-5qCFp8j62nWL6sSVv/RKuHscQUIV+VMMgWeHLYZQEBpAk7G+r3jA3bSKON7gZjiuxdZ/F4PXj2Jc1oPh/7Eg+g==}
+  postprocessing@6.39.5:
+    resolution: {integrity: sha512-YmH+t74J2X1lwYjKzK/tgs9C9kqWWPB9JwZiDF5mEf4BdCEAmEFbO8lXBA7NM0/j4g+x6FgD/Tt5/kT7ogbEDA==}
     peerDependencies:
-      three: '>= 0.157.0 < 0.184.0'
+      three: '>= 0.168.0 < 0.187.0'
 
   potpack@1.0.2:
     resolution: {integrity: sha512-choctRBIV9EMT9WGAZHn3V7t0Z2pMQyl0EZE6pFc/6ml3ssw7Dlf/oAOvFwjm1HVsqfQN8GfeFyJ+d8tRzqueQ==}
@@ -933,16 +930,16 @@ snapshots:
     dependencies:
       three: 0.184.0
 
-  '@navaramap/three-default-descs@0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)':
+  '@navaramap/three-default-descs@0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)':
     dependencies:
-      '@navaramap/three': 0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@navaramap/three': 0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       '@sparkjsdev/spark': 2.1.0(three@0.184.0)
-      '@takram/three-atmosphere': 0.19.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      '@takram/three-clouds': 0.7.6(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@takram/three-atmosphere': 0.19.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@takram/three-clouds': 0.7.6(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       '@takram/three-geospatial': 0.9.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      '@takram/three-geospatial-effects': 0.6.4(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      n8ao: 2.0.0(postprocessing@6.38.3(three@0.184.0))(three@0.184.0)
-      postprocessing: 6.38.3(three@0.184.0)
+      '@takram/three-geospatial-effects': 0.6.4(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      n8ao: 2.0.0(postprocessing@6.39.5(three@0.184.0))(three@0.184.0)
+      postprocessing: 6.39.5(three@0.184.0)
       three: 0.184.0
       tiny-invariant: 1.3.3
     transitivePeerDependencies:
@@ -951,10 +948,10 @@ snapshots:
       - '@react-three/postprocessing'
       - react
 
-  '@navaramap/three-default-plugin@0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)':
+  '@navaramap/three-default-plugin@0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)':
     dependencies:
-      '@navaramap/three': 0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      '@navaramap/three-default-descs': 0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@navaramap/three': 0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@navaramap/three-default-descs': 0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
     transitivePeerDependencies:
       - '@react-three/drei'
       - '@react-three/fiber'
@@ -963,13 +960,13 @@ snapshots:
       - react
       - three
 
-  '@navaramap/three-plugins@0.1.1(@navaramap/three-default-plugin@0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(three@0.184.0)':
+  '@navaramap/three-plugins@0.1.1(@navaramap/three-default-plugin@0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(three@0.184.0)':
     dependencies:
-      '@navaramap/three': 0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      '@navaramap/three-default-plugin': 0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@navaramap/three': 0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@navaramap/three-default-plugin': 0.1.1(@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0))(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       three: 0.184.0
 
-  '@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)':
+  '@navaramap/three@0.1.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)':
     dependencies:
       '@navaramap/core': 0.1.1
       '@navaramap/engine': 0.1.1
@@ -978,12 +975,12 @@ snapshots:
       '@navaramap/three-api': 0.1.1(three@0.184.0)
       '@navaramap/three-csm': 0.1.1(three@0.184.0)
       '@navaramap/worker': 0.1.1
-      '@takram/three-atmosphere': 0.19.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      '@takram/three-clouds': 0.7.6(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@takram/three-atmosphere': 0.19.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@takram/three-clouds': 0.7.6(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       '@takram/three-geospatial': 0.9.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      '@takram/three-geospatial-effects': 0.6.4(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@takram/three-geospatial-effects': 0.6.4(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       astronomy-engine: 2.1.19
-      postprocessing: 6.38.3(three@0.184.0)
+      postprocessing: 6.39.5(three@0.184.0)
       stats.js: 0.17.0
       three: 0.184.0
       three-stdlib: 2.36.1(three@0.184.0)
@@ -1079,11 +1076,11 @@ snapshots:
       fflate: 0.8.2
       three: 0.184.0
 
-  '@takram/three-atmosphere@0.19.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)':
+  '@takram/three-atmosphere@0.19.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)':
     dependencies:
       '@takram/three-geospatial': 0.9.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(react@19.2.0)(three@0.184.0)
       astronomy-engine: 2.1.19
-      postprocessing: 6.38.3(three@0.184.0)
+      postprocessing: 6.39.5(three@0.184.0)
       react-merge-refs: 3.0.2(react@19.2.0)
       three: 0.184.0
       tiny-invariant: 1.3.3
@@ -1092,11 +1089,11 @@ snapshots:
       '@react-three/fiber': 9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0)
       react: 19.2.0
 
-  '@takram/three-clouds@0.7.6(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)':
+  '@takram/three-clouds@0.7.6(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)':
     dependencies:
-      '@takram/three-atmosphere': 0.19.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)
+      '@takram/three-atmosphere': 0.19.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)
       '@takram/three-geospatial': 0.9.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      postprocessing: 6.38.3(three@0.184.0)
+      postprocessing: 6.39.5(three@0.184.0)
       three: 0.184.0
       tiny-invariant: 1.3.3
       type-fest: 5.6.0
@@ -1104,10 +1101,10 @@ snapshots:
       '@react-three/fiber': 9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0)
       react: 19.2.0
 
-  '@takram/three-geospatial-effects@0.6.4(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.38.3(three@0.184.0))(react@19.2.0)(three@0.184.0)':
+  '@takram/three-geospatial-effects@0.6.4(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(postprocessing@6.39.5(three@0.184.0))(react@19.2.0)(three@0.184.0)':
     dependencies:
       '@takram/three-geospatial': 0.9.1(@react-three/fiber@9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0))(react@19.2.0)(three@0.184.0)
-      postprocessing: 6.38.3(three@0.184.0)
+      postprocessing: 6.39.5(three@0.184.0)
       three: 0.184.0
     optionalDependencies:
       '@react-three/fiber': 9.6.0(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(three@0.184.0)
@@ -1421,9 +1418,9 @@ snapshots:
 
   meshoptimizer@1.1.1: {}
 
-  n8ao@2.0.0(postprocessing@6.38.3(three@0.184.0))(three@0.184.0):
+  n8ao@2.0.0(postprocessing@6.39.5(three@0.184.0))(three@0.184.0):
     dependencies:
-      postprocessing: 6.38.3(three@0.184.0)
+      postprocessing: 6.39.5(three@0.184.0)
       three: 0.184.0
 
   nanoid@3.3.11: {}
@@ -1438,7 +1435,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postprocessing@6.38.3(three@0.184.0):
+  postprocessing@6.39.5(three@0.184.0):
     dependencies:
       three: 0.184.0
 

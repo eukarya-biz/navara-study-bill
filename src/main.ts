@@ -36,8 +36,15 @@ import shipModelUrl from "./assets/models/ship.glb?url";
 import camelModelUrl from "./assets/models/camel.glb?url";
 import "./style.css";
 
+declare global {
+  interface Window {
+    /** Debug handle to the live view, for the browser console only. */
+    __view?: ThreeView<DefaultDescriptions>;
+  }
+}
+
 const view = new ThreeView<DefaultDescriptions>();
-(window as any).__view = view;
+window.__view = view;
 
 // Plugins
 
@@ -179,6 +186,15 @@ const MARKER_SPEED = DASH_FLOW_SPEED; // meters per second, matched to the dash 
 
 let routeMarkers: RouteMarker[] = [];
 let routeHoverTargets: RouteHoverTarget[] = [];
+// The subset of routeHoverTargets whose category is currently shown, refreshed
+// whenever the legend changes so pointermove does no filtering of its own.
+let visibleHoverTargets: RouteHoverTarget[] = [];
+
+function refreshVisibleHoverTargets() {
+  visibleHoverTargets = routeHoverTargets.filter((target) =>
+    currentActiveKeys.includes(target.categoryKey),
+  );
+}
 
 let currentEmpire: Empire | undefined;
 let currentActiveKeys: string[] = [];
@@ -288,6 +304,7 @@ function loadEmpire(empire: Empire) {
   currentEmpire = empire;
   currentActiveKeys = activeKeys;
   routeHoverTargets = buildRouteHoverTargets(empire);
+  refreshVisibleHoverTargets();
   syncRouteMarkers();
 
   // Two layers sharing one GeoJSON source: one for the marker dot, one for
@@ -333,9 +350,10 @@ function loadEmpire(empire: Empire) {
   });
 
   cityLabelsLayer.on("featureCreated", ({ evaluator }) => {
-    evaluator.evaluate(({ properties }) => ({
-      text: (properties?.name as string) ?? "",
-    }));
+    evaluator.evaluate(({ properties }) => {
+      const name = properties?.name;
+      return { text: typeof name === "string" ? name : "" };
+    });
   });
 
   if (empire.territory) {
@@ -361,6 +379,7 @@ function loadEmpire(empire: Empire) {
     onVisibilityChange: (keys, soloedTraceKey) => {
       currentTraceKey = soloedTraceKey;
       currentActiveKeys = keys;
+      refreshVisibleHoverTargets();
       for (const marker of routeMarkers) {
         marker.visible = keys.includes(marker.categoryKey);
       }
@@ -429,17 +448,14 @@ const HOVER_PIXEL_RADIUS = 14; // CSS pixels
 const hoverScratch = new Vector3();
 
 view.on("pointermove", (event) => {
-  const canvas = event.target as HTMLElement | null;
-  if (!canvas) return;
+  const canvas = event.target;
+  if (!(canvas instanceof HTMLElement)) return;
   const rect = canvas.getBoundingClientRect();
   const screenX = event.clientX - rect.left;
   const screenY = event.clientY - rect.top;
 
-  const visibleTargets = routeHoverTargets.filter((target) =>
-    currentActiveKeys.includes(target.categoryKey),
-  );
   const hovered = findHoveredRoute(
-    visibleTargets,
+    visibleHoverTargets,
     screenX,
     screenY,
     view.camera.raw,
@@ -470,8 +486,11 @@ view.on("featureClick", (info) => {
     return;
   }
 
-  const cityId = info.properties?.id as string | undefined;
-  const city = cityId ? currentEmpire.cities.find((candidate) => candidate.id === cityId) : undefined;
+  const cityId = info.properties?.id;
+  const city =
+    typeof cityId === "string"
+      ? currentEmpire.cities.find((candidate) => candidate.id === cityId)
+      : undefined;
   if (!city) {
     closeCityCard();
     return;
