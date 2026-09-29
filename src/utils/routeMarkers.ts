@@ -23,6 +23,8 @@ export type RouteMarker = {
   baseScale: number;
   forwardSign: number;
   visible: boolean;
+  /** Whether the instance currently holds the collapsed (hidden) matrix. */
+  hiddenApplied: boolean;
 };
 
 export type RouteMarkerMeshes = {
@@ -60,6 +62,7 @@ export function createRouteMarker(
     baseScale: route.mode === "sea" ? scales.ship : scales.camel,
     forwardSign: route.mode === "sea" ? SHIP_FORWARD_SIGN : CAMEL_FORWARD_SIGN,
     visible,
+    hiddenApplied: false,
   };
 }
 
@@ -77,6 +80,8 @@ const scratchScale = new Matrix4();
 const scratchRight = new Vector3();
 const scratchUp = new Vector3(0, 0, 1);
 const scratchForward = new Vector3();
+// A zero-scale matrix collapses an instance to nothing; written once per hide.
+const hiddenMatrix = new Matrix4().makeScale(0, 0, 0);
 
 export function updateRouteMarkers(
   markers: RouteMarker[],
@@ -85,6 +90,18 @@ export function updateRouteMarkers(
 ): void {
   const elapsedMeters = elapsedSeconds * markerSpeed;
   for (const marker of markers) {
+    // Hidden markers are collapsed once and then skipped: while tracing a
+    // single good most routes are hidden, so this saves their geodesic
+    // interpolation and frame math on every frame.
+    if (!marker.visible) {
+      if (!marker.hiddenApplied) {
+        marker.mesh.updateAt(marker.index, { matrix: hiddenMatrix });
+        marker.hiddenApplied = true;
+      }
+      continue;
+    }
+    marker.hiddenApplied = false;
+
     const distance = (elapsedMeters + marker.phaseOffset) % marker.totalDistance;
     const lookaheadDistance = Math.min(distance + MARKER_LOOKAHEAD, marker.totalDistance);
     const point = marker.geodesic.interpolateDistance(distance);
@@ -101,8 +118,7 @@ export function updateRouteMarkers(
     scratchForward.set(sinH * sign, cosH * sign, 0);
     scratchRotation.makeBasis(scratchRight, scratchUp, scratchForward);
 
-    const scale = marker.visible ? marker.baseScale : 0;
-    scratchScale.makeScale(scale, scale, scale);
+    scratchScale.makeScale(marker.baseScale, marker.baseScale, marker.baseScale);
 
     const matrix = enu.multiply(scratchRotation).multiply(scratchScale);
     marker.mesh.updateAt(marker.index, { matrix });
