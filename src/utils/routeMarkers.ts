@@ -2,11 +2,11 @@ import {
   eastNorthUpToFixedFrame,
   EllipsoidGeodesic,
   geodeticToVector3,
-} from "@navara/three";
-import type { InstancedGltfModelMeshDesc } from "@navara/three_default_descs";
+} from "@navaramap/three";
+import type { InstancedGltfModelMeshDesc } from "@navaramap/three-default-descs";
 import { Matrix4, Vector3 } from "three";
 import type { TradeRoute } from "../data/types";
-import { bearingBetween, toLatLngRad } from "./geo";
+import { bearingBetween, toLatLngHeight } from "./geo";
 
 const SHIP_FORWARD_SIGN = -1;
 const CAMEL_FORWARD_SIGN = 1;
@@ -43,8 +43,8 @@ export function createRouteMarker(
   visible: boolean,
 ): RouteMarker {
   const geodesic = new EllipsoidGeodesic(
-    toLatLngRad(cityById, route.from),
-    toLatLngRad(cityById, route.to),
+    toLatLngHeight(cityById, route.from),
+    toLatLngHeight(cityById, route.to),
   );
   const mesh = route.mode === "sea" ? meshes.ship : meshes.camel;
   const index = mesh.add({});

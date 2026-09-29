@@ -1,13 +1,15 @@
-import type { LatLng, LatLngHeight } from "@navara/three";
+import type { LatLng, LatLngHeight } from "@navaramap/three";
 
-export const DEG2RAD = Math.PI / 180;
+const DEG2RAD = Math.PI / 180;
 
+// Initial bearing from `from` toward `to`, in radians, for positions in degrees.
 export function bearingBetween(from: LatLngHeight, to: LatLngHeight): number {
-  const dLng = to.lng - from.lng;
-  const y = Math.sin(dLng) * Math.cos(to.lat);
+  const fromLat = from.lat * DEG2RAD;
+  const toLat = to.lat * DEG2RAD;
+  const dLng = (to.lng - from.lng) * DEG2RAD;
+  const y = Math.sin(dLng) * Math.cos(toLat);
   const x =
-    Math.cos(from.lat) * Math.sin(to.lat) -
-    Math.sin(from.lat) * Math.cos(to.lat) * Math.cos(dLng);
+    Math.cos(fromLat) * Math.sin(toLat) - Math.sin(fromLat) * Math.cos(toLat) * Math.cos(dLng);
   return Math.atan2(y, x);
 }
 
@@ -20,11 +22,11 @@ export function toLatLng(
   return { lat: city.lat, lng: city.lng };
 }
 
-export function toLatLngRad(
+export function toLatLngHeight(
   cityById: Map<string, { lat: number; lng: number }>,
   cityId: string,
 ): LatLngHeight {
   const city = cityById.get(cityId);
   if (!city) throw new Error(`Unknown city id: ${cityId}`);
-  return { lat: city.lat * DEG2RAD, lng: city.lng * DEG2RAD, height: 0 };
+  return { lat: city.lat, lng: city.lng, height: 0 };
 }

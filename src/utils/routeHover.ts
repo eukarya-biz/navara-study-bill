@@ -1,7 +1,7 @@
-import { EllipsoidGeodesic, geodeticToVector3 } from "@navara/three";
+import { EllipsoidGeodesic, geodeticToVector3 } from "@navaramap/three";
 import type { PerspectiveCamera, Vector3 } from "three";
 import type { Empire } from "../data/types";
-import { toLatLngRad } from "./geo";
+import { toLatLngHeight } from "./geo";
 
 const SAMPLE_COUNT = 20;
 
@@ -31,12 +31,12 @@ export function buildRouteHoverTargets(empire: Empire): RouteHoverTarget[] {
     const toCity = cityById.get(route.to);
     if (!category || !fromCity || !toCity) continue;
 
-    const fromRad = toLatLngRad(cityById, route.from);
-    const toRad = toLatLngRad(cityById, route.to);
-    const chordDistance = geodeticToVector3(fromRad).distanceTo(geodeticToVector3(toRad));
+    const fromPosition = toLatLngHeight(cityById, route.from);
+    const toPosition = toLatLngHeight(cityById, route.to);
+    const chordDistance = geodeticToVector3(fromPosition).distanceTo(geodeticToVector3(toPosition));
     const apexHeight = chordDistance * category.arcHeightScale;
 
-    const geodesic = new EllipsoidGeodesic(fromRad, toRad);
+    const geodesic = new EllipsoidGeodesic(fromPosition, toPosition);
     const points: Vector3[] = [];
     for (let i = 0; i < SAMPLE_COUNT; i++) {
       const t = i / (SAMPLE_COUNT - 1);
